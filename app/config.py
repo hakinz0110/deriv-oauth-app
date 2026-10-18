@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY')
-    CLIENT_ID = os.environ.get('CLIENT_ID')
+    SECRET_KEY = os.environ.get('SECRET_KEY', '3cd8b8e361007ebc7eb0a354c6628d296b32274e6146736abccfd7654a83ddef')
+    CLIENT_ID = os.environ.get('CLIENT_ID', '33x4yt1oLTBWGsLUTHRWo')
     REDIRECT_URI = os.environ.get('REDIRECT_URI')
     
     # Deriv OAuth endpoints from documentation
@@ -20,9 +20,5 @@ class Config:
     # Mock mode for development when OAuth is blocked
     MOCK_OAUTH = os.environ.get('MOCK_OAUTH', 'False').lower() == 'true'
     
-    if not SECRET_KEY:
-        raise ValueError("SECRET_KEY environment variable is required")
-    if not CLIENT_ID:
-        raise ValueError("CLIENT_ID environment variable is required")
     if not REDIRECT_URI:
         raise ValueError("REDIRECT_URI environment variable is required")
