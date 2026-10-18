@@ -1,0 +1,22 @@
+# Don't copy these to Docker image
+.env
+.env.*
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.git/
+.gitignore
+*.md
+!README.md
+.vscode/
+.idea/
+*.log
+.DS_Store
+Thumbs.db
+disable_ipv6.ps1
+enable_ipv6.ps1
