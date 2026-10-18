@@ -14,7 +14,8 @@ class Config:
     TOKEN_ENDPOINT = 'https://auth.deriv.com/oauth2/token'
     
     # OAuth scopes - request all needed scopes at authorization time
-    OAUTH_SCOPES = 'trade account_manage payment application_read'
+    # Start with basic scopes that are commonly available
+    OAUTH_SCOPES = os.environ.get('OAUTH_SCOPES', 'trade account_manage')
     
     # Mock mode for development when OAuth is blocked
     MOCK_OAUTH = os.environ.get('MOCK_OAUTH', 'False').lower() == 'true'
