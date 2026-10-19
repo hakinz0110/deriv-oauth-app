@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Back - Deriv Bot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+        }
+
+        .secure-badge {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #888;
+            line-height: 1.5;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: #666;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+        }
+
+        .toggle-password:hover {
+            color: #fff;
+        }
+
+        .forgot-link {
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .forgot-link a {
+            color: #888;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s;
+        }
+
+        .forgot-link a:hover {
+            color: #ff9800;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #ff9800;
+            color: #000;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary:hover {
+            background: #ffab00;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            position: relative;
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            position: relative;
+            background: #000;
+            padding: 0 16px;
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .btn-oauth {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-oauth:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .apple-icon {
+            font-size: 20px;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .signup-link a {
+            color: #ff9800;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .terms {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 11px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .terms a {
+            color: #888;
+            text-decoration: underline;
+        }
+
+        .terms a:hover {
+            color: #fff;
+        }
+
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 24px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+
+        .time {
+            font-weight: 600;
+        }
+
+        .signal-icons {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.1);
+            border: 1px solid rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+
+        .alert-warning {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .title {
+                font-size: 28px;
+            }
+            
+            .container {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- iOS-style Status Bar -->
+    <div class="status-bar">
+        <div class="time">9:41</div>
+        <div class="signal-icons">
+            <span>📶</span>
+            <span>📡</span>
+            <span>🔋</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <button class="back-button" onclick="window.location.href='/'">
+                ←
+            </button>
+            <div class="logo">DERIV BOT</div>
+        </div>
+
+        <div class="secure-badge">🔒 SECURE ACCESS</div>
+        <h1 class="title">Welcome back.</h1>
+        <p class="subtitle">Sign in to continue monitoring your markets and portfolio.</p>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- OAuth Login Form (Simulated for UX, actual OAuth handled by backend) -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label class="form-label">Email address</label>
+                <input 
+                    type="email" 
+                    class="form-input" 
+                    placeholder="you@example.com"
+                    id="emailInput"
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        placeholder="Enter your password"
+                        id="passwordInput"
+                        autocomplete="current-password"
+                    >
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        👁️
+                    </button>
+                </div>
+                <div class="forgot-link">
+                    <a href="#" onclick="showForgotPassword(); return false;">Forgot password?</a>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="loginBtn">
+                <span id="loginBtnText">Log in</span>
+                <span id="loginSpinner" class="spinner hidden"></span>
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>or continue with</span>
+        </div>
+
+        <button class="btn btn-oauth" onclick="loginWithDeriv()">
+            <span class="apple-icon">🎯</span>
+            <span>Continue with Deriv OAuth</span>
+        </button>
+
+        <div class="signup-link">
+            New to Deriv?<a href="#" onclick="signUp(); return false;">Create an account</a>
+        </div>
+
+        <div class="terms">
+            By continuing, you agree to our <a href="#">Terms of Service</a><br>
+            and acknowledge our <a href="#">Privacy Policy</a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin;
+
+        // Toggle password visibility
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            const button = event.target.closest('.toggle-password');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+
+        // Show alert message
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertContainer');
+            const alertClass = type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass}">
+                    <span>${type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+        }
+
+        // Handle form submission
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+
+            if (!email || !password) {
+                showAlert('Please enter your email and password', 'warning');
+                return;
+            }
+
+            // Show info about OAuth requirement
+            showAlert('This app uses Deriv OAuth. Click "Continue with Deriv OAuth" below.', 'info');
+        }
+
+        // Login with Deriv OAuth (actual OAuth flow)
+        function loginWithDeriv() {
+            const btn = document.querySelector('.btn-oauth');
+            btn.innerHTML = '<span class="spinner"></span> Redirecting to Deriv...';
+            btn.disabled = true;
+
+            // Redirect to actual OAuth login endpoint
+            setTimeout(() => {
+                window.location.href = `${API_BASE_URL}/login`;
+            }, 800);
+        }
+
+        // Sign up flow
+        function signUp() {
+            const btn = event.target;
+            showAlert('Redirecting to Deriv registration...', 'info');
+            
+            setTimeout(() => {
+                window.location.href = `${API_BASE_URL}/signup`;
+            }, 1000);
+        }
+
+        // Forgot password
+        function showForgotPassword() {
+            showAlert('Password reset is handled through your Deriv account. Please visit deriv.com', 'info');
+        }
+
+        // Check if already authenticated
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/`);
+                const data = await response.json();
+
+                if (data.status === 'authenticated') {
+                    showAlert('You are already logged in. Redirecting...', 'info');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+            }
+        });
+
+        // Auto-focus email input
+        document.getElementById('emailInput').focus();
+    </script>
+</body>
+</html>

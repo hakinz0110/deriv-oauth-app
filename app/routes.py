@@ -50,11 +50,20 @@ def index():
 @auth_bp.route('/login')
 def login():
     """
-    Initiate OAuth login flow.
-    Redirects user to Deriv authorization endpoint.
+    Login page or OAuth redirect.
+    - Browser request with HTML Accept header: Shows login UI
+    - Direct access or API request: Redirects to Deriv OAuth
     """
-    from flask import current_app
+    from flask import current_app, render_template
     
+    # Check if request wants HTML (browser)
+    accept_header = request.headers.get('Accept', '')
+    
+    # If it's a browser requesting HTML, show login page
+    if 'text/html' in accept_header and request.args.get('direct') != '1':
+        return render_template('login.html')
+    
+    # Otherwise, proceed with OAuth flow
     # Mock mode for development when OAuth is blocked
     if current_app.config.get('MOCK_OAUTH'):
         # Generate mock authorization code
@@ -89,9 +98,12 @@ def login():
 @auth_bp.route('/signup')
 def signup():
     """
-    Initiate OAuth signup flow.
-    Redirects user to Deriv registration form.
+    Signup page or OAuth redirect with registration prompt.
+    - Browser request: Could show signup UI (for now redirects to OAuth)
+    - Direct access: Redirects to Deriv registration
     """
+    from flask import current_app
+    
     # Generate PKCE parameters
     code_verifier = DerivOAuthClient.generate_code_verifier()
     code_challenge = DerivOAuthClient.generate_code_challenge(code_verifier)
