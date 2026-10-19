@@ -1,0 +1,62 @@
+# Deriv OAuth Application - Deployment URLs
+
+## Railway (Primary - Fast, No Spin-Down)
+Home/UI:    https://web-production-d675d.up.railway.app/
+Login:      https://web-production-d675d.up.railway.app/login
+Health:     https://web-production-d675d.up.railway.app/health
+Test URL:   https://web-production-d675d.up.railway.app/test-url
+Accounts:   https://web-production-d675d.up.railway.app/accounts
+Logout:     https://web-production-d675d.up.railway.app/logout
+
+## Render (Backup - Always Active via UptimeRobot)
+Home/UI:    https://deriv-oauth-app.onrender.com/
+Login:      https://deriv-oauth-app.onrender.com/login
+Health:     https://deriv-oauth-app.onrender.com/health
+Test URL:   https://deriv-oauth-app.onrender.com/test-url
+Accounts:   https://deriv-oauth-app.onrender.com/accounts
+Logout:     https://deriv-oauth-app.onrender.com/logout
+
+## NEW - Phase 2 Endpoints (Account Management)
+All Accounts:       /accounts
+Demo Accounts:      /accounts/demo
+Real Accounts:      /accounts/real
+Select Account:     POST /accounts/select {"account_id": "CR123456"}
+Selected Account:   /accounts/selected
+Clear Selection:    POST /accounts/clear
+WebSocket URL:      /websocket/url (requires auth + account selection)
+Market Data WS:     /market-data/url
+
+## NEW - Frontend UI
+Onboarding Screen:  https://web-production-d675d.up.railway.app/
+- Shows real account data when authenticated
+- Login/Signup flow for unauthenticated users
+- Real-time balance display
+- Account overview with demo/real balances
+- Mobile-responsive design
+
+## Registered Redirect URIs in Deriv Dashboard
+- https://web-production-d675d.up.railway.app/callback
+- https://deriv-oauth-app.onrender.com/callback
+
+## UptimeRobot Monitoring
+Service:    https://uptimerobot.com/dashboard
+Monitoring: https://deriv-oauth-app.onrender.com/health (every 5 minutes)
+
+## OAuth Application Details
+Client ID:  33x4yt1oLTBWGsLUTHRWo
+Scopes:     trade account_manage
+
+## GitHub Repository
+Repo:       https://github.com/hakinz0110/deriv-oauth-app
+
+## Current Accounts (Test Data)
+Real Account:  ROT91837061 - $0.00 USD (active)
+Demo Account:  DOT93136231 - $9,758.24 USD (active)
+
+## Status
+Railway:    ✅ Online (No spin-down) + UI
+Render:     ✅ Online (Kept alive by UptimeRobot) + UI
+Frontend:   ✅ Onboarding screen deployed
+Phase 2:    ✅ Account management complete
+Total Cost: $0/month
+
