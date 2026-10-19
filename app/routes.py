@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, request, jsonify, session
+﻿from flask import Blueprint, redirect, request, jsonify, session
 from app.oauth_client import DerivOAuthClient
 from app.token_service import TokenService
 from app.session_service import SessionService
@@ -26,7 +26,7 @@ def index():
     
     if 'text/html' in accept_header:
         # Serve HTML page
-        return render_template('index.html')
+        return render_template('onboarding.html')
     
     # Return JSON for API clients
     mock_mode = current_app.config.get('MOCK_OAUTH', False)
@@ -480,3 +480,4 @@ def get_market_data_url():
         'authentication': 'none',
         'note': 'Connect directly to this URL for public market data'
     })
+
