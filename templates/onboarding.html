@@ -3,198 +3,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTS Trade</title>
+    <title>HTS Trade - Onboarding</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            background: #1a1a1a;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(180deg, #F5F0E8 0%, #F5F0E8 30%, #E8D5F0 70%, #D4C5E8 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 0;
+            margin: 0;
         }
-        .phone-mockup {
+
+        .container {
             width: 100%;
-            max-width: 390px;
-            height: 844px;
-            background: linear-gradient(180deg, #f5f0e8 0%, #f5f0e8 40%, #e8d5f0 70%, #d4c5e8 100%);
-            border-radius: 50px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        }
-        .notch {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 30px;
-            background: #000;
-            border-radius: 0 0 20px 20px;
-            z-index: 100;
-        }
-        .status-bar {
+            max-width: 428px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #F5F0E8 0%, #F5F0E8 30%, #E8D5F0 70%, #D4C5E8 100%);
             display: flex;
-            justify-content: space-between;
-            padding: 12px 24px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #000;
-            z-index: 10;
+            flex-direction: column;
+            padding: 20px 24px 40px;
         }
+
         .top-bar {
             display: flex;
             justify-content: space-between;
-            padding: 0 24px 20px;
-            font-size: 14px;
+            align-items: center;
+            padding: 12px 0;
+            margin-bottom: 40px;
         }
-        .page-indicator { color: #666; font-weight: 500; }
-        .skip-btn { color: #d4af37; font-weight: 600; text-decoration: none; }
-        .content {
+
+        .page-indicator {
+            font-size: 14px;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .skip-btn {
+            color: #D4AF37;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .skip-btn:hover {
+            opacity: 0.8;
+        }
+
+        .logo-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 30px;
-            text-align: center;
+            margin: 60px 0 80px;
+            position: relative;
         }
-        .logo-container { position: relative; margin-bottom: 60px; }
+
         .logo-circle {
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #f5f0e8 0%, #fff 50%, #f5f0e8 100%);
-            border: 8px solid #d4af37;
+            background: linear-gradient(135deg, #FDFCFA 0%, #FFFFFF 50%, #F8F6F3 100%);
+            border: 8px solid #D4AF37;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.25);
+            position: relative;
         }
+
         .logo-text-hts {
-            font-size: 42px;
+            font-size: 48px;
             font-weight: 700;
-            color: #d4af37;
-            letter-spacing: 2px;
-            font-family: Georgia, serif;
+            color: #D4AF37;
+            letter-spacing: 3px;
+            line-height: 1;
+            font-family: Georgia, 'Times New Roman', serif;
         }
+
         .logo-text-trade {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            color: #c9a961;
-            letter-spacing: 4px;
-            margin-top: -5px;
-            font-family: Georgia, serif;
+            color: #C9A961;
+            letter-spacing: 6px;
+            margin-top: -2px;
+            font-family: Georgia, 'Times New Roman', serif;
         }
+
         .badge-rise {
             position: absolute;
-            top: -10px;
-            right: -30px;
-            background: #4caf50;
-            color: #fff;
-            padding: 6px 12px;
+            top: -5px;
+            right: -40px;
+            background: #4CAF50;
+            color: white;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
+            white-space: nowrap;
             box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
         }
+
         .badge-winrate {
             position: absolute;
-            bottom: -10px;
-            left: -30px;
-            color: #7b61ff;
+            bottom: -5px;
+            left: -40px;
+            color: #7B61FF;
             font-size: 13px;
             font-weight: 600;
+            white-space: nowrap;
         }
+
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+        }
+
         .headline {
             font-size: 28px;
             font-weight: 700;
-            color: #000;
+            color: #000000;
             margin-bottom: 16px;
+            line-height: 1.2;
         }
-        .subtitle {
+
+        .description {
             font-size: 15px;
-            color: #666;
+            color: #666666;
             line-height: 1.6;
-            margin-bottom: 40px;
-            max-width: 300px;
+            margin-bottom: 50px;
+            max-width: 320px;
         }
+
+        .description .highlight {
+            color: #D4AF37;
+            font-weight: 600;
+        }
+
         .pagination {
             display: flex;
             gap: 8px;
             margin-bottom: 30px;
         }
+
         .dot {
             width: 32px;
             height: 4px;
             border-radius: 2px;
-            background: #d0d0d0;
+            background: #D0D0D0;
+            transition: all 0.3s ease;
         }
+
         .dot.active {
-            background: #d4af37;
+            background: #D4AF37;
             width: 40px;
         }
+
         .next-btn {
             width: 100%;
-            max-width: 330px;
+            max-width: 380px;
             padding: 18px;
-            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
             border: none;
-            border-radius: 25px;
-            color: #000;
-            font-size: 16px;
+            border-radius: 28px;
+            color: #000000;
+            font-size: 17px;
             font-weight: 700;
-            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+            transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
-            transition: transform 0.3s;
         }
-        .next-btn:hover { transform: translateY(-2px); }
-        .home-indicator {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 140px;
-            height: 5px;
-            background: #000;
-            border-radius: 10px;
-            opacity: 0.3;
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.45);
+        }
+
+        .next-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 428px) {
+            .container {
+                max-width: 100%;
+                padding: 16px 20px 30px;
+            }
+
+            .logo-section {
+                margin: 40px 0 60px;
+            }
+
+            .logo-circle {
+                width: 180px;
+                height: 180px;
+            }
+
+            .logo-text-hts {
+                font-size: 42px;
+            }
+
+            .logo-text-trade {
+                font-size: 20px;
+            }
+
+            .badge-rise {
+                right: -35px;
+            }
+
+            .badge-winrate {
+                left: -35px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="phone-mockup">
-        <div class="notch"></div>
-        <div class="status-bar">
-            <div>9:41</div>
-            <div>5G 📶 🔋</div>
-        </div>
+    <div class="container">
+        <!-- Top Bar -->
         <div class="top-bar">
             <div class="page-indicator">1/3</div>
             <a href="#" class="skip-btn">Skip</a>
         </div>
-        <div class="content">
-            <div class="logo-container">
-                <div class="logo-circle">
-                    <div class="logo-text-hts">HTS</div>
-                    <div class="logo-text-trade">TRADE</div>
-                </div>
+
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-circle">
+                <div class="logo-text-hts">HTS</div>
+                <div class="logo-text-trade">TRADE</div>
                 <div class="badge-rise">Rise · Payout 95%</div>
                 <div class="badge-winrate">Win rate 62%</div>
             </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="content-section">
             <h1 class="headline">Trade with precision</h1>
-            <p class="subtitle">HTS Trade runs your strategies on Deriv around the clock, while you stay in control.</p>
+            <p class="description">
+                HTS Trade runs your strategies on <span class="highlight">Deriv</span> around the clock, while you stay in control.
+            </p>
+
+            <!-- Pagination Dots -->
             <div class="pagination">
                 <div class="dot active"></div>
                 <div class="dot"></div>
                 <div class="dot"></div>
             </div>
+
+            <!-- Next Button -->
             <a href="/login" class="next-btn">Next</a>
         </div>
-        <div class="home-indicator"></div>
     </div>
 </body>
 </html>
