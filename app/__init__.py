@@ -1,8 +1,11 @@
 from flask import Flask
 from app.config import Config
+import os
 
 def create_app():
-    app = Flask(__name__)
+    # Set template folder to project root/templates
+    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates'))
+    app = Flask(__name__, template_folder=template_dir)
     app.config.from_object(Config)
     
     # Register error handlers

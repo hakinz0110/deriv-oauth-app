@@ -18,9 +18,17 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/')
 def index():
-    """Health check and authentication status."""
-    from flask import current_app
+    """Main page - serves onboarding UI or returns JSON based on Accept header."""
+    from flask import current_app, render_template
     
+    # Check if request is from browser (HTML) or API client (JSON)
+    accept_header = request.headers.get('Accept', '')
+    
+    if 'text/html' in accept_header:
+        # Serve HTML page
+        return render_template('index.html')
+    
+    # Return JSON for API clients
     mock_mode = current_app.config.get('MOCK_OAUTH', False)
     
     if SessionService.is_authenticated():
