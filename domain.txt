@@ -28,6 +28,15 @@ Market Data WS:     /market-data/url
 
 ## NEW - Frontend UI
 Onboarding Screen:  https://web-production-d675d.up.railway.app/
+Login Screen:       https://web-production-d675d.up.railway.app/login
+- Apple-style login design with dark theme
+- OAuth integration with "Continue with Deriv OAuth" button
+- Email/password fields with visibility toggle
+- Auto-redirect if already authenticated
+- Sign up link for new users
+- Responsive mobile design
+
+Onboarding Features:
 - Shows real account data when authenticated
 - Login/Signup flow for unauthenticated users
 - Real-time balance display
