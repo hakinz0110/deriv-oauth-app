@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
             min-height: 100vh;
             padding-bottom: 80px;
@@ -333,17 +333,18 @@
         async function loadTradeDetails() {
             // TODO: Get trade ID from URL parameter and fetch details
             const urlParams = new URLSearchParams(window.location.search);
-            const tradeId = urlParams.get(''id'');
+            const tradeId = urlParams.get('id');
             
             if (tradeId) {
                 // TODO: Fetch from backend API
-                console.log(''Loading trade:'', tradeId);
+                console.log('Loading trade:', tradeId);
             }
         }
 
-        document.addEventListener(''DOMContentLoaded'', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             loadTradeDetails();
         });
     </script>
 </body>
 </html>
+

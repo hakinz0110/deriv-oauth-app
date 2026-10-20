@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
             min-height: 100vh;
             padding-bottom: 80px;
@@ -284,7 +284,7 @@
                 <div class="strategy-header">
                     <div class="strategy-info">
                         <h3>Momentum Rider</h3>
-                        <div class="strategy-meta">Rise / Fall · Win rate 92%</div>
+                        <div class="strategy-meta">Rise / Fall Â· Win rate 92%</div>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" checked>
@@ -295,7 +295,7 @@
                 <!-- Expanded Details -->
                 <div class="strategy-details">
                     <div class="detail-section">
-                        <div class="detail-header">Risk · Momentum Rider</div>
+                        <div class="detail-header">Risk Â· Momentum Rider</div>
                         <div class="detail-row">
                             <div class="detail-label">Risk per trade</div>
                             <div class="detail-value">2.0% of balance</div>
@@ -333,7 +333,7 @@
                 <div class="strategy-header">
                     <div class="strategy-info">
                         <h3>Digit Edge</h3>
-                        <div class="strategy-meta">Digits · Win rate 94%</div>
+                        <div class="strategy-meta">Digits Â· Win rate 94%</div>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox">
@@ -347,7 +347,7 @@
                 <div class="strategy-header">
                     <div class="strategy-info">
                         <h3>Multiplier Guard</h3>
-                        <div class="strategy-meta">Multipliers · Win rate 58%</div>
+                        <div class="strategy-meta">Multipliers Â· Win rate 58%</div>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" checked>
@@ -397,11 +397,11 @@
 
     <script>
         // Tab switching logic
-        const tabs = document.querySelectorAll(''.tab-btn'');
+        const tabs = document.querySelectorAll('.tab-btn');
         tabs.forEach(tab => {
-            tab.addEventListener(''click'', function() {
-                tabs.forEach(t => t.classList.remove(''active''));
-                this.classList.add(''active'');
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
             });
         });
 
@@ -411,10 +411,11 @@
             // For now, showing hardcoded values
         }
 
-        document.addEventListener(''DOMContentLoaded'', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             loadStrategies();
         });
     </script>
 </body>
 </html>
+
 

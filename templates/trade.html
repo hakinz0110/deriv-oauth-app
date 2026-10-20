@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
             min-height: 100vh;
             padding-bottom: 80px;
@@ -376,18 +376,18 @@
 
     <script>
         // Direction button handlers
-        const riseBtn = document.getElementById(''rise-btn'');
-        const fallBtn = document.getElementById(''fall-btn'');
-        const autoBtn = document.getElementById(''auto-btn'');
+        const riseBtn = document.getElementById('rise-btn');
+        const fallBtn = document.getElementById('fall-btn');
+        const autoBtn = document.getElementById('auto-btn');
 
         function setActiveDirection(activeButton) {
-            [riseBtn, fallBtn, autoBtn].forEach(btn => btn.classList.remove(''active''));
-            activeButton.classList.add(''active'');
+            [riseBtn, fallBtn, autoBtn].forEach(btn => btn.classList.remove('active'));
+            activeButton.classList.add('active');
         }
 
-        riseBtn.addEventListener(''click'', () => setActiveDirection(riseBtn));
-        fallBtn.addEventListener(''click'', () => setActiveDirection(fallBtn));
-        autoBtn.addEventListener(''click'', () => setActiveDirection(autoBtn));
+        riseBtn.addEventListener('click', () => setActiveDirection(riseBtn));
+        fallBtn.addEventListener('click', () => setActiveDirection(fallBtn));
+        autoBtn.addEventListener('click', () => setActiveDirection(autoBtn));
 
         // Load trade data (placeholder for WebSocket/API integration)
         async function loadTradeData() {
@@ -395,9 +395,10 @@
             // For now, showing N/A until endpoints are connected
         }
 
-        document.addEventListener(''DOMContentLoaded'', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             loadTradeData();
         });
     </script>
 </body>
 </html>
+

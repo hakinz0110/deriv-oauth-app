@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
             min-height: 100vh;
             padding-bottom: 80px;
@@ -389,39 +389,40 @@
         // Load account details
         async function loadAccountDetails() {
             try {
-                const response = await fetch(''/accounts/selected'');
+                const response = await fetch('/accounts/selected');
                 if (response.ok) {
                     const data = await response.json();
                     const account = data.selected_account;
                     
                     if (account && account.account_id) {
-                        const details = `${account.account_id} · ${account.account_type || ''Demo''} · ${account.currency || ''USD''}`;
-                        document.getElementById(''account-details'').textContent = details;
+                        const details = `${account.account_id} Â· ${account.account_type || 'Demo'} Â· ${account.currency || 'USD'}`;
+                        document.getElementById('account-details').textContent = details;
                     }
                 }
             } catch (error) {
-                console.error(''Failed to load account details:'', error);
+                console.error('Failed to load account details:', error);
             }
         }
 
         // Handle logout
         function handleLogout() {
-            if (confirm(''Are you sure you want to log out?'')) {
-                fetch(''/logout'')
+            if (confirm('Are you sure you want to log out?')) {
+                fetch('/logout')
                     .then(() => {
-                        window.location.href = ''/'';
+                        window.location.href = '/';
                     })
                     .catch(error => {
-                        console.error(''Logout failed:'', error);
-                        alert(''Failed to log out. Please try again.'');
+                        console.error('Logout failed:', error);
+                        alert('Failed to log out. Please try again.');
                     });
             }
         }
 
         // Initialize
-        document.addEventListener(''DOMContentLoaded'', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             loadAccountDetails();
         });
     </script>
 </body>
 </html>
+

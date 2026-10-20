@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
             min-height: 100vh;
             padding-bottom: 80px;
@@ -362,27 +362,28 @@
     <script>
         function saveStrategy() {
             const strategy = {
-                name: document.getElementById(''strategy-name'').value,
-                contract_type: document.getElementById(''contract-type'').value,
-                asset: document.getElementById(''asset'').value,
-                stake: parseFloat(document.getElementById(''stake'').value),
-                duration: document.getElementById(''duration'').value,
-                risk_percent: parseFloat(document.getElementById(''risk-percent'').value),
-                martingale: document.getElementById(''martingale'').checked,
-                stop_loss: parseFloat(document.getElementById(''stop-loss'').value),
-                daily_limit: parseFloat(document.getElementById(''daily-limit'').value)
+                name: document.getElementById('strategy-name').value,
+                contract_type: document.getElementById('contract-type').value,
+                asset: document.getElementById('asset').value,
+                stake: parseFloat(document.getElementById('stake').value),
+                duration: document.getElementById('duration').value,
+                risk_percent: parseFloat(document.getElementById('risk-percent').value),
+                martingale: document.getElementById('martingale').checked,
+                stop_loss: parseFloat(document.getElementById('stop-loss').value),
+                daily_limit: parseFloat(document.getElementById('daily-limit').value)
             };
 
             if (!strategy.name) {
-                alert(''Please enter a strategy name'');
+                alert('Please enter a strategy name');
                 return;
             }
 
             // TODO: Send to backend API
-            console.log(''Creating strategy:'', strategy);
-            alert(''Strategy created successfully!'');
-            window.location.href = ''/strategy'';
+            console.log('Creating strategy:', strategy);
+            alert('Strategy created successfully!');
+            window.location.href = '/strategy';
         }
     </script>
 </body>
 </html>
+

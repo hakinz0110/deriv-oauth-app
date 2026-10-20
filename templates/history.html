@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
             min-height: 100vh;
             padding-bottom: 80px;
@@ -329,36 +329,37 @@
 
     <script>
         // Filter tab switching
-        const filterTabs = document.querySelectorAll(''.filter-tab'');
+        const filterTabs = document.querySelectorAll('.filter-tab');
         filterTabs.forEach(tab => {
-            tab.addEventListener(''click'', function() {
-                filterTabs.forEach(t => t.classList.remove(''active''));
-                this.classList.add(''active'');
+            tab.addEventListener('click', function() {
+                filterTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
                 loadHistory(this.textContent.toLowerCase());
             });
         });
 
         // Load history data
-        async function loadHistory(filter = ''all'') {
+        async function loadHistory(filter = 'all') {
             try {
                 // TODO: Fetch trade history from backend API
                 // const response = await fetch(`/api/history?filter=${filter}`);
                 // For now, showing empty state with N/A
                 
                 // Update stats
-                document.getElementById(''total-trades'').textContent = ''N/A'';
-                document.getElementById(''win-rate'').textContent = ''N/A'';
-                document.getElementById(''net-pnl'').textContent = ''N/A'';
+                document.getElementById('total-trades').textContent = 'N/A';
+                document.getElementById('win-rate').textContent = 'N/A';
+                document.getElementById('net-pnl').textContent = 'N/A';
                 
             } catch (error) {
-                console.error(''Failed to load history:'', error);
+                console.error('Failed to load history:', error);
             }
         }
 
         // Initialize
-        document.addEventListener(''DOMContentLoaded'', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             loadHistory();
         });
     </script>
 </body>
 </html>
+

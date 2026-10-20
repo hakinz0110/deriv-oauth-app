@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
             min-height: 100vh;
             padding-bottom: 80px;
@@ -306,11 +306,11 @@
 
     <script>
         // Timeframe button handlers
-        const timeframeBtns = document.querySelectorAll(''.timeframe-btn'');
+        const timeframeBtns = document.querySelectorAll('.timeframe-btn');
         timeframeBtns.forEach(btn => {
-            btn.addEventListener(''click'', function() {
-                timeframeBtns.forEach(b => b.classList.remove(''active''));
-                this.classList.add(''active'');
+            btn.addEventListener('click', function() {
+                timeframeBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
             });
         });
 
@@ -319,9 +319,10 @@
             // TODO: Integrate chart library (TradingView, Chart.js, etc.)
         }
 
-        document.addEventListener(''DOMContentLoaded'', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             loadChartData();
         });
     </script>
 </body>
 </html>
+

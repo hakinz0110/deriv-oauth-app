@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
             min-height: 100vh;
             padding-bottom: 80px;
@@ -421,7 +421,7 @@
             <div class="balance-card">
                 <div class="balance-label">Total balance</div>
                 <div class="balance-amount" id="balance-amount">N/A</div>
-                <div class="balance-change positive" id="balance-change">Today''s P/L N/A</div>
+                <div class="balance-change positive" id="balance-change">Today's P/L N/A</div>
             </div>
 
             <!-- Bot Status Card -->
@@ -509,7 +509,7 @@
                     
                     // Update account type
                     document.getElementById('account-type').textContent = 
-                        `${account.account_type || 'Demo'} � ${account.currency || 'USD'}`;
+                        `${account.account_type || 'Demo'} · ${account.currency || 'USD'}`;
                     
                     // Update balance
                     if (account.balance !== undefined) {
@@ -537,4 +537,5 @@
 </body>
 </html>
 </html>
+
 
