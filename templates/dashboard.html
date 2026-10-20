@@ -420,7 +420,7 @@
             <!-- Balance Card -->
             <div class="balance-card">
                 <div class="balance-label">Total balance</div>
-                <div class="balance-amount" id="balance-amount">N/A</div>
+                <div class="balance-amount"><span id="total-balance">N/A</span> <span id="balance-currency"></span></div>
                 <div class="balance-change positive" id="balance-change">Today's P/L N/A</div>
             </div>
 
@@ -534,8 +534,10 @@
             loadOpenTrades();
         });
     </script>
+    <script src="/static/deriv-websocket.js"></script>
 </body>
 </html>
 </html>
+
 
 
