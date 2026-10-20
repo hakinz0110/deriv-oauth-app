@@ -498,46 +498,13 @@
         </div>
     </div>
 
-    <script>
-        // Fetch account data
-        async function loadAccountData() {
-            try {
-                const response = await fetch('/accounts/selected');
-                if (response.ok) {
-                    const data = await response.json();
-                    const account = data.selected_account;
-                    
-                    // Update account type
-                    document.getElementById('account-type').textContent = 
-                        `${account.account_type || 'Demo'} · ${account.currency || 'USD'}`;
-                    
-                    // Update balance
-                    if (account.balance !== undefined) {
-                        document.getElementById('balance-amount').textContent = 
-                            `${parseFloat(account.balance).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to load account data:', error);
-            }
-        }
-
-        // Fetch open trades (placeholder for WebSocket implementation)
-        async function loadOpenTrades() {
-            // TODO: Implement WebSocket connection to get real-time trades
-            // For now, showing N/A until WebSocket is connected
-        }
-
-        // Load data on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAccountData();
-            loadOpenTrades();
-        });
-    </script>
+        <script src="/static/auth-check.js"></script>
     <script src="/static/deriv-websocket.js"></script>
 </body>
 </html>
 </html>
+
+
 
 
 
