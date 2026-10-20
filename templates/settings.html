@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTS Trade - Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 428px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            padding: 16px 20px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .content {
+            padding: 0 20px;
+        }
+
+        .account-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .account-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .account-info {
+            flex: 1;
+        }
+
+        .account-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 4px;
+        }
+
+        .account-details {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .connected-badge {
+            background: #E8F5E9;
+            color: #4CAF50;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .settings-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 8px 0;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .settings-item, .settings-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .settings-item:hover, .settings-link:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .settings-label {
+            font-size: 15px;
+            color: #000;
+            font-weight: 500;
+        }
+
+        .settings-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .chevron {
+            width: 16px;
+            height: 16px;
+            stroke: #999;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.06);
+            margin: 0 20px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 51px;
+            height: 31px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #D0D0D0;
+            border-radius: 31px;
+            transition: 0.3s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            color: #E74C3C;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            width: 100%;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 428px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #999;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #D4AF37;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            stroke: #999;
+            transition: stroke 0.2s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            stroke: #D4AF37;
+        }
+
+        @media (max-width: 428px) {
+            .container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Settings</h1>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Account Card -->
+            <div class="account-card">
+                <div class="account-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div class="account-info">
+                    <div class="account-title">Deriv account</div>
+                    <div class="account-details" id="account-details">N/A</div>
+                </div>
+                <div class="connected-badge">Connected</div>
+            </div>
+
+            <!-- Settings Card -->
+            <div class="settings-card">
+                <a href="/profile" class="settings-link">
+                    <div class="settings-label">Account</div>
+                    <div class="settings-value">
+                        <span>Profile</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </a>
+
+                <div class="settings-item">
+                    <div class="settings-label">Broker connection</div>
+                    <div class="settings-value">
+                        <span>Deriv</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+
+                <a href="/risk-limits" class="settings-link">
+                    <div class="settings-label">Risk limits</div>
+                    <div class="settings-value">
+                        <span>$100 / day</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </a>
+
+                <div class="divider"></div>
+
+                <div class="settings-item">
+                    <div class="settings-label">Notifications</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-item">
+                    <div class="settings-label">Security</div>
+                    <div class="settings-value">
+                        <span>Face ID</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="settings-item">
+                    <div class="settings-label">Theme</div>
+                    <div class="settings-value">
+                        <span>Light</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="settings-item">
+                    <div class="settings-label">Language</div>
+                    <div class="settings-value">
+                        <span>English</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Out Button -->
+            <button class="logout-btn" onclick="handleLogout()">Log out</button>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="/dashboard" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+            <a href="/chart" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </a>
+            <a href="/trade" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </a>
+            <a href="/history" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 16 14"></polyline>
+                </svg>
+            </a>
+            <a href="/settings" class="nav-item active">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m5.6-14.6l-4.2 4.2m-2.8 2.8l-4.2 4.2M23 12h-6m-6 0H1m20.6 5.6l-4.2-4.2m-2.8-2.8l-4.2-4.2"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Load account details
+        async function loadAccountDetails() {
+            try {
+                const response = await fetch(''/accounts/selected'');
+                if (response.ok) {
+                    const data = await response.json();
+                    const account = data.selected_account;
+                    
+                    if (account && account.account_id) {
+                        const details = `${account.account_id} · ${account.account_type || ''Demo''} · ${account.currency || ''USD''}`;
+                        document.getElementById(''account-details'').textContent = details;
+                    }
+                }
+            } catch (error) {
+                console.error(''Failed to load account details:'', error);
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            if (confirm(''Are you sure you want to log out?'')) {
+                fetch(''/logout'')
+                    .then(() => {
+                        window.location.href = ''/'';
+                    })
+                    .catch(error => {
+                        console.error(''Logout failed:'', error);
+                        alert(''Failed to log out. Please try again.'');
+                    });
+            }
+        }
+
+        // Initialize
+        document.addEventListener(''DOMContentLoaded'', () => {
+            loadAccountDetails();
+        });
+    </script>
+</body>
+</html>

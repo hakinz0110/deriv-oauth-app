@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTS Trade - Risk Limits</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 428px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            gap: 16px;
+        }
+
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .content {
+            padding: 0 20px;
+        }
+
+        .description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .limits-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .limit-group {
+            margin-bottom: 24px;
+        }
+
+        .limit-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .limit-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .limit-description {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .limit-input {
+            width: 100%;
+            padding: 14px 16px 14px 36px;
+            border-radius: 12px;
+            border: 2px solid #E0E0E0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            background: white;
+            transition: border-color 0.2s ease;
+        }
+
+        .limit-input:focus {
+            outline: none;
+            border-color: #D4AF37;
+        }
+
+        .warning-card {
+            background: #FFF3E0;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .warning-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            color: #F57C00;
+        }
+
+        .warning-text {
+            font-size: 13px;
+            color: #E65100;
+            line-height: 1.5;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
+            border: none;
+            border-radius: 28px;
+            color: #000;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.45);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 428px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #999;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #D4AF37;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            stroke: #999;
+            transition: stroke 0.2s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            stroke: #D4AF37;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" onclick="history.back()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <h1 class="header-title">Risk Limits</h1>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <p class="description">
+                Set your risk limits to protect your balance. The bot will automatically stop when limits are reached.
+            </p>
+
+            <!-- Limits Card -->
+            <div class="limits-card">
+                <div class="limit-group">
+                    <div class="limit-label">Stop-loss per trade</div>
+                    <div class="limit-description">Maximum loss allowed per single trade</div>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" class="limit-input" id="stop-loss" value="50.00" step="0.01" min="0">
+                    </div>
+                </div>
+
+                <div class="limit-group">
+                    <div class="limit-label">Daily loss limit</div>
+                    <div class="limit-description">Maximum loss allowed per day</div>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" class="limit-input" id="daily-limit" value="100.00" step="0.01" min="0">
+                    </div>
+                </div>
+
+                <div class="limit-group">
+                    <div class="limit-label">Daily profit target</div>
+                    <div class="limit-description">Bot stops after reaching this profit (optional)</div>
+                    <div class="input-wrapper">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" class="limit-input" id="profit-target" value="200.00" step="0.01" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Warning Card -->
+            <div class="warning-card">
+                <svg class="warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div class="warning-text">
+                    These limits help protect your account. Make sure they align with your risk tolerance and trading strategy.
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <button class="save-btn" onclick="saveRiskLimits()">Save Changes</button>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="/dashboard" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+            <a href="/chart" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </a>
+            <a href="/trade" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </a>
+            <a href="/history" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </a>
+            <a href="/settings" class="nav-item active">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m5.6-14.6l-4.2 4.2m-2.8 2.8l-4.2 4.2M23 12h-6m-6 0H1m20.6 5.6l-4.2-4.2m-2.8-2.8l-4.2-4.2"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function saveRiskLimits() {
+            const stopLoss = document.getElementById(''stop-loss'').value;
+            const dailyLimit = document.getElementById(''daily-limit'').value;
+            const profitTarget = document.getElementById(''profit-target'').value;
+
+            // TODO: Send to backend API
+            const limits = {
+                stop_loss: parseFloat(stopLoss),
+                daily_limit: parseFloat(dailyLimit),
+                profit_target: parseFloat(profitTarget)
+            };
+
+            console.log(''Saving risk limits:'', limits);
+            alert(''Risk limits saved successfully!'');
+        }
+
+        document.addEventListener(''DOMContentLoaded'', () => {
+            // TODO: Load current limits from backend
+        });
+    </script>
+</body>
+</html>

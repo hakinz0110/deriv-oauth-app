@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTS Trade - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 50%, #C8E6D0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 428px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 50%, #C8E6D0 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+        }
+
+        .logo-section {
+            margin-bottom: 40px;
+        }
+
+        .logo-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FDFCFA 0%, #FFFFFF 50%, #F8F6F3 100%);
+            border: 6px solid #D4AF37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(212, 175, 55, 0.25);
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 12px;
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+
+        .welcome-subtitle {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.5;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .auth-buttons {
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
+            border: none;
+            border-radius: 28px;
+            color: #000000;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .divider {
+            text-align: center;
+            color: #999999;
+            font-size: 13px;
+            margin: 8px 0;
+        }
+
+        .secondary-btn {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #E0E0E0;
+            border-radius: 28px;
+            color: #000000;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: #D0D0D0;
+            transform: translateY(-1px);
+        }
+
+        .footer-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .forgot-link {
+            color: #000000;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .forgot-link:hover {
+            color: #D4AF37;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #999999;
+            line-height: 1.4;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .info-text a {
+            color: #7B61FF;
+            text-decoration: none;
+        }
+
+        .info-text a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 428px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .logo-circle {
+                width: 100px;
+                height: 100px;
+            }
+
+            .welcome-title {
+                font-size: 28px;
+            }
+
+            .auth-buttons {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-circle">
+                <img src="/img/download.png" alt="HTS TRADE">
+            </div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1 class="welcome-title">Welcome back</h1>
+            <p class="welcome-subtitle">Log in with your Deriv account to connect your trading bot.</p>
+        </div>
+
+        <!-- Auth Buttons -->
+        <div class="auth-buttons">
+            <a href="/login?direct=1" class="primary-btn">Log in with Deriv</a>
+            
+            <div class="divider">or</div>
+            
+            <a href="/signup" class="secondary-btn">Sign up on Deriv</a>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer-section">
+            <a href="https://deriv.com/reset-password" target="_blank" class="forgot-link">Forgot password?</a>
+            <p class="info-text">Log in, sign up and password reset open on <a href="https://deriv.com" target="_blank">deriv.com</a></p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTS Trade - Trade</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 428px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .bot-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+        }
+
+        .content {
+            padding: 0 20px;
+        }
+
+        .asset-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .asset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .asset-label {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .asset-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .asset-price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .asset-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .asset-change {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4CAF50;
+        }
+
+        .dropdown-icon {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(76, 175, 80, 0.05) 0%, transparent 100%);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .trade-params-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .param-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .param-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .param-group {
+            flex: 1;
+        }
+
+        .param-group:first-child {
+            margin-right: 16px;
+        }
+
+        .param-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 6px;
+        }
+
+        .param-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .direction-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .direction-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #E0E0E0;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .direction-btn.active {
+            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
+            border-color: #D4AF37;
+            color: #000;
+        }
+
+        .stop-bot-btn {
+            width: calc(100% - 40px);
+            margin: 0 20px 20px;
+            padding: 18px;
+            background: #FFE5E5;
+            border: none;
+            border-radius: 28px;
+            color: #E74C3C;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stop-bot-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(231, 76, 60, 0.3);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 428px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #999;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #D4AF37;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            stroke: #999;
+            transition: stroke 0.2s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            stroke: #D4AF37;
+        }
+
+        @media (max-width: 428px) {
+            .container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Trade</h1>
+            <div class="bot-status">
+                <span class="status-dot"></span>
+                <span>Bot running</span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Asset Card -->
+            <div class="asset-card">
+                <div class="asset-header">
+                    <div>
+                        <div class="asset-label">Asset</div>
+                        <div class="asset-name" id="asset-name">N/A</div>
+                    </div>
+                    <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="asset-price-row">
+                    <div class="asset-price" id="asset-price">N/A</div>
+                    <div class="asset-change" id="asset-change">N/A</div>
+                </div>
+            </div>
+
+            <!-- Chart Card -->
+            <div class="chart-card">
+                <div class="chart-placeholder">
+                    <!-- Chart will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Trade Parameters Card -->
+            <div class="trade-params-card">
+                <div class="param-row">
+                    <div class="param-group">
+                        <div class="param-label">Contract</div>
+                        <div class="param-value" id="contract-type">Rise / Fall</div>
+                    </div>
+                    <div class="param-group">
+                        <div class="param-label">Duration</div>
+                        <div class="param-value" id="duration">5 ticks</div>
+                    </div>
+                </div>
+
+                <div class="param-row">
+                    <div class="param-group">
+                        <div class="param-label">Stake</div>
+                        <div class="param-value" id="stake">$10.00</div>
+                    </div>
+                    <div class="param-group">
+                        <div class="param-label">Payout (win +$9.50)</div>
+                        <div class="param-value" id="payout">95%</div>
+                    </div>
+                </div>
+
+                <div class="param-row" style="margin-bottom: 0;">
+                    <div class="param-group" style="margin-right: 0;">
+                        <div class="param-label">Direction</div>
+                    </div>
+                </div>
+
+                <div class="direction-buttons">
+                    <button class="direction-btn" id="rise-btn">Rise</button>
+                    <button class="direction-btn" id="fall-btn">Fall</button>
+                    <button class="direction-btn active" id="auto-btn">Auto</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stop Bot Button -->
+        <button class="stop-bot-btn">Stop Bot</button>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="/dashboard" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+            <a href="/chart" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </a>
+            <a href="/trade" class="nav-item active">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </a>
+            <a href="/history" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </a>
+            <a href="/settings" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m5.6-14.6l-4.2 4.2m-2.8 2.8l-4.2 4.2M23 12h-6m-6 0H1m20.6 5.6l-4.2-4.2m-2.8-2.8l-4.2-4.2"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Direction button handlers
+        const riseBtn = document.getElementById(''rise-btn'');
+        const fallBtn = document.getElementById(''fall-btn'');
+        const autoBtn = document.getElementById(''auto-btn'');
+
+        function setActiveDirection(activeButton) {
+            [riseBtn, fallBtn, autoBtn].forEach(btn => btn.classList.remove(''active''));
+            activeButton.classList.add(''active'');
+        }
+
+        riseBtn.addEventListener(''click'', () => setActiveDirection(riseBtn));
+        fallBtn.addEventListener(''click'', () => setActiveDirection(fallBtn));
+        autoBtn.addEventListener(''click'', () => setActiveDirection(autoBtn));
+
+        // Load trade data (placeholder for WebSocket/API integration)
+        async function loadTradeData() {
+            // TODO: Fetch current asset, price, and trade parameters
+            // For now, showing N/A until endpoints are connected
+        }
+
+        document.addEventListener(''DOMContentLoaded'', () => {
+            loadTradeData();
+        });
+    </script>
+</body>
+</html>

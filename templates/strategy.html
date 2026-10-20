@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTS Trade - Strategies</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, ''SF Pro Display'', ''Segoe UI'', Roboto, ''Helvetica Neue'', Arial, sans-serif;
+            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 428px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .new-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #D4AF37;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 0 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
+            color: #000;
+        }
+
+        .strategy-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .strategy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .strategy-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 4px;
+        }
+
+        .strategy-meta {
+            font-size: 13px;
+            color: #7B61FF;
+            font-weight: 500;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 51px;
+            height: 31px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #D0D0D0;
+            border-radius: 31px;
+            transition: 0.3s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .strategy-details {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .detail-section {
+            margin-bottom: 16px;
+        }
+
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .save-btn {
+            width: calc(100% - 40px);
+            margin: 20px 20px;
+            padding: 18px;
+            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
+            border: none;
+            border-radius: 28px;
+            color: #000;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.45);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 428px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #999;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #D4AF37;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            stroke: #999;
+            transition: stroke 0.2s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            stroke: #D4AF37;
+        }
+
+        @media (max-width: 428px) {
+            .container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">Strategies</h1>
+            <a href="/strategy/new" class="new-btn" style="text-decoration: none; color: inherit;">
+                <span>+</span>
+                <span>New</span>
+            </a></div><!-- Content -->
+        <div class="content">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active">Rise / Fall</button>
+                <button class="tab-btn">Digits</button>
+                <button class="tab-btn">Touch</button>
+                <button class="tab-btn">Multipliers</button>
+            </div>
+
+            <!-- Strategy Cards -->
+            
+            <!-- Momentum Rider (Expanded) -->
+            <div class="strategy-card">
+                <div class="strategy-header">
+                    <div class="strategy-info">
+                        <h3>Momentum Rider</h3>
+                        <div class="strategy-meta">Rise / Fall � Win rate 92%</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Expanded Details -->
+                <div class="strategy-details">
+                    <div class="detail-section">
+                        <div class="detail-header">Risk � Momentum Rider</div>
+                        <div class="detail-row">
+                            <div class="detail-label">Risk per trade</div>
+                            <div class="detail-value">2.0% of balance</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-row">
+                            <div class="detail-label">Martingale</div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-row">
+                            <div class="detail-label">Stop-loss</div>
+                            <div class="detail-value">$50.00</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-row">
+                            <div class="detail-label">Daily loss limit</div>
+                            <div class="detail-value">$100.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Digit Edge -->
+            <div class="strategy-card">
+                <div class="strategy-header">
+                    <div class="strategy-info">
+                        <h3>Digit Edge</h3>
+                        <div class="strategy-meta">Digits � Win rate 94%</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Multiplier Guard -->
+            <div class="strategy-card">
+                <div class="strategy-header">
+                    <div class="strategy-info">
+                        <h3>Multiplier Guard</h3>
+                        <div class="strategy-meta">Multipliers � Win rate 58%</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <button class="save-btn">Save strategy</button>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="/dashboard" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+            <a href="/chart" class="nav-item active">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </a>
+            <a href="/trade" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </a>
+            <a href="/history" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </a>
+            <a href="/settings" class="nav-item">
+                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m5.6-14.6l-4.2 4.2m-2.8 2.8l-4.2 4.2M23 12h-6m-6 0H1m20.6 5.6l-4.2-4.2m-2.8-2.8l-4.2-4.2"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching logic
+        const tabs = document.querySelectorAll(''.tab-btn'');
+        tabs.forEach(tab => {
+            tab.addEventListener(''click'', function() {
+                tabs.forEach(t => t.classList.remove(''active''));
+                this.classList.add(''active'');
+            });
+        });
+
+        // Load strategy data (placeholder)
+        async function loadStrategies() {
+            // TODO: Fetch strategies from backend
+            // For now, showing hardcoded values
+        }
+
+        document.addEventListener(''DOMContentLoaded'', () => {
+            loadStrategies();
+        });
+    </script>
+</body>
+</html>
+
