@@ -4,6 +4,7 @@ from app.token_service import TokenService
 from app.session_service import SessionService
 from app.account_service import AccountService, AccountServiceError
 from app.websocket_service import WebSocketService, WebSocketServiceError
+from app.supabase_service import SupabaseService
 from app.errors import (
     require_authentication,
     require_account_selection,
@@ -525,4 +526,5 @@ def get_market_data_url():
         'authentication': 'none',
         'note': 'Connect directly to this URL for public market data'
     })
+
 
