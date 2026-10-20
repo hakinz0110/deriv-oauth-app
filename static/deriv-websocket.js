@@ -1,9 +1,97 @@
-﻿// Deriv WebSocket connection manager for real-time balance streaming
+﻿// Deriv Data Cache Manager - Persists data across page navigation
+class DerivDataCache {
+    constructor() {
+        this.CACHE_KEY = 'deriv_app_data';
+        this.CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
+    }
+
+    save(data) {
+        const cacheData = {
+            timestamp: Date.now(),
+            data: data
+        };
+        localStorage.setItem(this.CACHE_KEY, JSON.stringify(cacheData));
+    }
+
+    load() {
+        try {
+            const cached = localStorage.getItem(this.CACHE_KEY);
+            if (!cached) return null;
+
+            const cacheData = JSON.parse(cached);
+            const age = Date.now() - cacheData.timestamp;
+
+            // Return cached data even if expired (it's better than N/A)
+            // But mark it as stale
+            return {
+                ...cacheData.data,
+                _isStale: age > this.CACHE_EXPIRY,
+                _age: age
+            };
+        } catch (error) {
+            console.error('Failed to load cache:', error);
+            return null;
+        }
+    }
+
+    clear() {
+        localStorage.removeItem(this.CACHE_KEY);
+    }
+
+    update(field, value) {
+        const cached = this.load();
+        const data = cached || {};
+        delete data._isStale;
+        delete data._age;
+        
+        data[field] = value;
+        this.save(data);
+    }
+}
+
+// Deriv WebSocket connection manager for real-time balance streaming
 class DerivWebSocketClient {
     constructor() {
         this.ws = null;
         this.connected = false;
         this.subscriptions = new Map();
+        this.cache = new DerivDataCache();
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 3;
+    }
+
+    async initialize() {
+        // First, load and display cached data immediately
+        this.loadCachedData();
+        
+        // Then connect to get fresh data
+        await this.connect();
+    }
+
+    loadCachedData() {
+        const cached = this.cache.load();
+        
+        if (!cached) {
+            console.log('No cached data available');
+            return;
+        }
+
+        console.log('Loading cached data (age:', Math.round(cached._age / 1000), 'seconds)');
+        
+        // Display cached balance
+        if (cached.balance !== undefined) {
+            this.updateBalance(cached.balance, true); // true = from cache
+        }
+
+        // Display cached account info
+        if (cached.account) {
+            this.updateAccountInfo(cached.account, true);
+        }
+
+        // Show stale indicator if data is old
+        if (cached._isStale) {
+            console.warn('Cached data is stale, fetching fresh data...');
+        }
     }
 
     async connect() {
@@ -13,13 +101,14 @@ class DerivWebSocketClient {
             // 1. Get list of accounts
             console.log('Step 1: Fetching accounts...');
             const accountsRes = await fetch('/accounts', {
-                credentials: 'same-origin'  // Include session cookies
+                credentials: 'same-origin'
             });
             
             if (!accountsRes.ok) {
                 console.error('Failed to fetch accounts:', accountsRes.status, accountsRes.statusText);
                 const error = await accountsRes.json().catch(() => ({}));
                 console.error('Error details:', error);
+                this.handleConnectionError('Failed to fetch accounts');
                 return;
             }
             
@@ -32,6 +121,9 @@ class DerivWebSocketClient {
                 return;
             }
 
+            // Cache accounts list
+            this.cache.update('accounts', accountsData.accounts);
+
             // 2. Select first active account
             console.log('Step 2: Selecting account...');
             const account = accountsData.accounts.find(acc => acc.status === 'active');
@@ -42,6 +134,10 @@ class DerivWebSocketClient {
             }
             
             console.log('Selected account:', account.account_id, account.account_type);
+            
+            // Cache selected account
+            this.cache.update('account', account);
+            this.updateAccountInfo(account, false);
 
             // 3. Select the account via API
             console.log('Step 3: Setting selected account...');
@@ -56,6 +152,7 @@ class DerivWebSocketClient {
                 console.error('Failed to select account:', selectRes.status);
                 const error = await selectRes.json().catch(() => ({}));
                 console.error('Error details:', error);
+                this.handleConnectionError('Failed to select account');
                 return;
             }
             
@@ -71,6 +168,7 @@ class DerivWebSocketClient {
                 console.error('Failed to get WebSocket URL:', wsRes.status);
                 const error = await wsRes.json().catch(() => ({}));
                 console.error('Error details:', error);
+                this.handleConnectionError('Failed to get WebSocket URL');
                 return;
             }
             
@@ -89,6 +187,7 @@ class DerivWebSocketClient {
             this.ws.onopen = () => {
                 console.log('✓ WebSocket connected successfully');
                 this.connected = true;
+                this.reconnectAttempts = 0;
                 
                 // Subscribe to balance updates
                 this.subscribeToBalance();
@@ -109,11 +208,18 @@ class DerivWebSocketClient {
             this.ws.onclose = (event) => {
                 console.log('WebSocket disconnected:', event.code, event.reason);
                 this.connected = false;
+                
+                // Auto-reconnect if not intentional disconnect
+                if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+                    this.reconnectAttempts++;
+                    console.log(`Reconnecting... (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+                    setTimeout(() => this.connect(), 2000);
+                }
             };
 
         } catch (error) {
             console.error('Connection error:', error);
-            this.showError('Failed to establish connection: ' + error.message);
+            this.handleConnectionError('Connection failed: ' + error.message);
         }
     }
 
@@ -136,7 +242,12 @@ class DerivWebSocketClient {
         // Handle balance updates
         if (message.balance !== undefined) {
             console.log('Balance update received:', message.balance);
-            this.updateBalance(message.balance);
+            
+            // Cache the balance data
+            this.cache.update('balance', message.balance);
+            
+            // Update UI
+            this.updateBalance(message.balance, false);
         }
 
         // Handle subscription confirmation
@@ -151,8 +262,8 @@ class DerivWebSocketClient {
         }
     }
 
-    updateBalance(balanceData) {
-        console.log('Updating UI with balance:', balanceData);
+    updateBalance(balanceData, isFromCache = false) {
+        console.log(`Updating UI with balance (${isFromCache ? 'cached' : 'live'}):`, balanceData);
         
         // Update balance amount
         const balanceElement = document.getElementById('total-balance');
@@ -161,6 +272,13 @@ class DerivWebSocketClient {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
+            
+            // Add visual indicator for cached data
+            if (isFromCache) {
+                balanceElement.style.opacity = '0.7';
+            } else {
+                balanceElement.style.opacity = '1';
+            }
         }
 
         // Update currency
@@ -168,45 +286,84 @@ class DerivWebSocketClient {
         if (currencyElement && balanceData.currency) {
             currencyElement.textContent = balanceData.currency;
         }
+    }
 
-        // Update account type badge if present
+    updateAccountInfo(account, isFromCache = false) {
+        console.log(`Updating account info (${isFromCache ? 'cached' : 'live'}):`, account);
+        
         const accountTypeElement = document.getElementById('account-type');
-        if (accountTypeElement && balanceData.loginid) {
-            // Extract account type from loginid (e.g., "VRTC" = demo, "CR" = real)
-            const isDemoAccount = balanceData.loginid && balanceData.loginid.startsWith('VRT');
-            accountTypeElement.textContent = `${isDemoAccount ? 'Demo' : 'Real'} · ${balanceData.currency || 'USD'}`;
+        if (accountTypeElement) {
+            const accountType = account.account_type || 'Demo';
+            const currency = account.currency || 'USD';
+            accountTypeElement.textContent = `${accountType} · ${currency}`;
+            
+            // Add visual indicator for cached data
+            if (isFromCache) {
+                accountTypeElement.style.opacity = '0.7';
+            } else {
+                accountTypeElement.style.opacity = '1';
+            }
+        }
+
+        // Update balance if available in account object
+        if (account.balance !== undefined) {
+            this.updateBalance({
+                balance: account.balance,
+                currency: account.currency
+            }, isFromCache);
+        }
+    }
+
+    handleConnectionError(message) {
+        console.error('Connection error:', message);
+        
+        // Still show cached data even if connection fails
+        const cached = this.cache.load();
+        if (cached) {
+            console.log('Showing cached data despite connection error');
+        } else {
+            this.showError(message);
         }
     }
 
     showError(message) {
         console.error('Showing error to user:', message);
-        // Could display this in the UI instead of just console
+        
+        // Don't overwrite cached data with error message
+        const cached = this.cache.load();
+        if (cached && cached.balance) {
+            console.log('Keeping cached balance visible despite error');
+            return;
+        }
+        
+        // Only show error if no cached data
         const balanceElement = document.getElementById('total-balance');
         if (balanceElement) {
-            balanceElement.textContent = 'Error';
+            balanceElement.textContent = 'N/A';
         }
     }
 
     disconnect() {
         if (this.ws) {
             console.log('Disconnecting WebSocket...');
-            this.ws.close();
+            this.ws.close(1000, 'User navigated away'); // 1000 = normal closure
             this.ws = null;
             this.connected = false;
         }
     }
 }
 
-// Initialize on page load
+// Global instance
 let derivClient;
 
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     console.log('=== HTS Trade WebSocket Client Starting ===');
     derivClient = new DerivWebSocketClient();
-    derivClient.connect();
+    derivClient.initialize(); // Load cache first, then connect
 });
 
-// Clean up on page unload
+// Clean up on page unload (but keep cache)
 window.addEventListener('beforeunload', () => {
     if (derivClient) {
         derivClient.disconnect();
