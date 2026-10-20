@@ -528,3 +528,120 @@ def get_market_data_url():
     })
 
 
+
+
+@auth_bp.route('/api/save-balance', methods=['POST'])
+@require_authentication
+def save_balance():
+    """
+    Save balance update from WebSocket to Supabase.
+    Called by frontend when WebSocket receives balance update.
+    
+    Request Body:
+        {
+            "balance": 10500.50,
+            "currency": "USD",
+            "loginid": "DOT90004580"
+        }
+    
+    Returns:
+        JSON response with success/error
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'balance' not in data:
+            return jsonify({
+                'error': 'INVALID_REQUEST',
+                'message': 'Balance data required'
+            }), 400
+        
+        # Get current session and account
+        selected_account = SessionService.get_selected_account()
+        
+        if not selected_account:
+            return jsonify({
+                'error': 'NO_ACCOUNT',
+                'message': 'No account selected'
+            }), 400
+        
+        # Update account data in session with new balance
+        selected_account['balance'] = data['balance']
+        if 'currency' in data:
+            selected_account['currency'] = data['currency']
+        
+        # Save updated account to session (which persists to Supabase)
+        SessionService.set_selected_account(selected_account)
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Balance saved successfully'
+        })
+        
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.error(f'Failed to save balance: {str(e)}')
+        return jsonify({
+            'error': 'SAVE_FAILED',
+            'message': 'Failed to save balance'
+        }), 500
+
+
+@auth_bp.route('/api/save-trade', methods=['POST'])
+@require_authentication
+def save_trade():
+    """
+    Save trade from WebSocket to Supabase.
+    
+    Request Body:
+        {
+            "direction": "CALL",
+            "symbol": "R_100",
+            "contract_type": "MULTUP",
+            "stake": 10.00,
+            "entry_price": 1234.56,
+            "contract_id": "abc123",
+            ...
+        }
+    """
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'error': 'INVALID_REQUEST',
+                'message': 'Trade data required'
+            }), 400
+        
+        # Get current account
+        selected_account = SessionService.get_selected_account()
+        
+        if not selected_account:
+            return jsonify({
+                'error': 'NO_ACCOUNT',
+                'message': 'No account selected'
+            }), 400
+        
+        # Get user ID from session (using account_id as user_id for now)
+        user_id = selected_account.get('account_id')
+        
+        # Save trade to Supabase
+        trade_record = SupabaseService.save_trade(
+            user_id=user_id,
+            trade_data=data
+        )
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Trade saved successfully',
+            'trade': trade_record
+        })
+        
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.error(f'Failed to save trade: {str(e)}')
+        return jsonify({
+            'error': 'SAVE_FAILED',
+            'message': 'Failed to save trade'
+        }), 500
+

@@ -262,7 +262,7 @@ class DerivWebSocketClient {
         }
     }
 
-    updateBalance(balanceData, isFromCache = false) {
+        updateBalance(balanceData, isFromCache = false) {
         console.log(`Updating UI with balance (${isFromCache ? 'cached' : 'live'}):`, balanceData);
         
         // Update balance amount
@@ -285,6 +285,37 @@ class DerivWebSocketClient {
         const currencyElement = document.getElementById('balance-currency');
         if (currencyElement && balanceData.currency) {
             currencyElement.textContent = balanceData.currency;
+        }
+        
+        // Save to backend (Supabase) if this is live data
+        if (!isFromCache && typeof balanceData.balance === 'number') {
+            this.saveBalanceToBackend(balanceData);
+        }
+    }
+    
+    async saveBalanceToBackend(balanceData) {
+        try {
+            const response = await fetch('/api/save-balance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    balance: balanceData.balance,
+                    currency: balanceData.currency,
+                    loginid: balanceData.loginid
+                })
+            });
+            
+            if (response.ok) {
+                console.log('✓ Balance saved to database');
+            } else {
+                console.warn('Failed to save balance to database:', response.status);
+            }
+        } catch (error) {
+            console.warn('Could not save balance to backend:', error);
+            // Don't show error to user - this is a background save
         }
     }
 
@@ -369,3 +400,4 @@ window.addEventListener('beforeunload', () => {
         derivClient.disconnect();
     }
 });
+
