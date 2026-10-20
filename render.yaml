@@ -1,0 +1,25 @@
+﻿services:
+  - type: web
+    name: hts-trade
+    runtime: python
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DERIV_APP_ID
+        sync: false
+      - key: DERIV_CLIENT_SECRET
+        sync: false
+      - key: REDIRECT_URI
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: DERIV_API_URL
+        value: https://api.deriv.com
+      - key: DERIV_OAUTH_URL
+        value: https://oauth.deriv.com
+      - key: DERIV_WEBSOCKET_URL
+        value: wss://ws.derivws.com/websockets/v3
