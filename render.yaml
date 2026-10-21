@@ -1,14 +1,12 @@
 ﻿services:
   - type: web
     name: hts-trade
-    runtime: python
+    runtime: python3
     plan: free
     branch: main
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn run:app
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.0
       - key: DERIV_APP_ID
         sync: false
       - key: DERIV_CLIENT_SECRET
@@ -16,6 +14,10 @@
       - key: REDIRECT_URI
         sync: false
       - key: SECRET_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
         sync: false
       - key: DERIV_API_URL
         value: https://api.deriv.com
