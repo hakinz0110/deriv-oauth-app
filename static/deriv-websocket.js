@@ -381,6 +381,22 @@ class DerivWebSocketClient {
             this.ws = null;
             this.connected = false;
         }
+
+    async reconnect() {
+        console.log('Reconnecting WebSocket for account switch...');
+        
+        // Disconnect existing connection
+        this.disconnect();
+        
+        // Clear cache to force fresh data
+        this.cache.clear();
+        
+        // Reset reconnect attempts
+        this.reconnectAttempts = 0;
+        
+        // Reconnect
+        await this.connect();
+    }
     }
 }
 
@@ -400,4 +416,5 @@ window.addEventListener('beforeunload', () => {
         derivClient.disconnect();
     }
 });
+
 

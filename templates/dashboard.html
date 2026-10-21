@@ -385,6 +385,140 @@
         .nav-item.active .nav-icon {
             stroke: #D4AF37;
         }
+        /* Account Selector Dropdown Styles */
+        .account-dropdown {
+            position: fixed;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            min-width: 320px;
+            max-width: 380px;
+            z-index: 1000;
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .account-dropdown-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #F0F0F0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .account-dropdown-warning {
+            padding: 12px 20px;
+            background: #FFF9E6;
+            border-bottom: 1px solid #FFE5B4;
+            font-size: 13px;
+            color: #856404;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .account-dropdown-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .account-dropdown-item {
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            position: relative;
+        }
+
+        .account-dropdown-item:hover:not(.disabled) {
+            background: #F8F9FA;
+        }
+
+        .account-dropdown-item.selected {
+            background: #F0F7FF;
+        }
+
+        .account-dropdown-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .account-item-main {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .account-item-id {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .account-item-type {
+            font-size: 12px;
+            color: #7B61FF;
+            font-weight: 500;
+        }
+
+        .account-item-balance {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .account-item-amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .account-item-currency {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .account-item-check {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4CAF50;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .account-dropdown-empty {
+            padding: 32px 20px;
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .demo-badge {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .demo-badge:hover {
+            opacity: 0.8;
+        }
+
 
         @media (max-width: 428px) {
             .container {
@@ -497,12 +631,65 @@
             </a>
         </div>
     </div>
+    <script src="/static/account-selector.js"></script>
+    <script>
+        // Initialize account selector with WebSocket reconnection
+        let accountSelector;
+        let wsClient;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize account selector
+            accountSelector = new AccountSelector();
+            
+            // Initialize with callback for account switching
+            await accountSelector.initialize(async (newAccount) => {
+                console.log('Account switched, reconnecting WebSocket...', newAccount);
+                
+                // Disconnect existing WebSocket
+                if (wsClient && wsClient.ws) {
+                    wsClient.ws.close();
+                    wsClient.connected = false;
+                }
+                
+                // Clear cache and reconnect
+                if (wsClient && wsClient.cache) {
+                    wsClient.cache.clear();
+                }
+                
+                // Reinitialize WebSocket with new account
+                if (typeof DerivWebSocketClient !== 'undefined') {
+                    wsClient = new DerivWebSocketClient();
+                    await wsClient.initialize();
+                }
+            });
+
+            // Store wsClient reference for account selector
+            if (typeof DerivWebSocketClient !== 'undefined') {
+                wsClient = new DerivWebSocketClient();
+                await wsClient.initialize();
+            }
+
+            // Update bot status monitoring
+            const observer = new MutationObserver(() => {
+                if (accountSelector) {
+                    accountSelector.updateBotStatus();
+                }
+            });
+
+            const statusDot = document.getElementById('bot-status-dot');
+            if (statusDot) {
+                observer.observe(statusDot, { attributes: true, attributeFilter: ['class'] });
+            }
+        });
+    </script>
+
 
         <script src="/static/auth-check.js"></script>
     <script src="/static/deriv-websocket.js"></script>
 </body>
 </html>
 </html>
+
 
 
 
