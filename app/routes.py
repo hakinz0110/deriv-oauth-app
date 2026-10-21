@@ -406,11 +406,8 @@ def select_account():
         if not selected:
             raise AccountNotFoundError(f'Account {account_id} not found or not accessible')
         
-        # Store selected account in session
-        SessionService.store_selected_account(
-            account_id=selected['account_id'],
-            account_type=selected.get('account_type')
-        )
+        # Store selected account in session (full object for Supabase)
+        SessionService.set_selected_account(selected)
         
         return jsonify({
             'status': 'success',
@@ -644,4 +641,5 @@ def save_trade():
             'error': 'SAVE_FAILED',
             'message': 'Failed to save trade'
         }), 500
+
 
