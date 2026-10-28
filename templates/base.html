@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}Deriv Trading Bot{% endblock %}</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Master Kill Switch (Global Emergency Stop) -->
+    <button type="button" id="master-kill-switch" class="master-kill-switch" title="Emergency Stop - Pause Bot Immediately">
+        <svg class="kill-switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <circle cx="12" cy="12" r="10"/>
+            <rect x="9" y="9" width="6" height="6" rx="1"/>
+        </svg>
+        <span class="kill-switch-label">STOP</span>
+        <span class="kill-switch-pulse"></span>
+    </button>
+
+    <!-- Kill Switch Confirmation Modal -->
+    <div id="kill-switch-modal" class="kill-switch-modal hidden">
+        <div class="kill-switch-modal-content">
+            <div class="kill-switch-modal-header">
+                <svg class="kill-switch-modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <h3 class="kill-switch-modal-title">Emergency Stop</h3>
+                <p class="kill-switch-modal-desc">This will immediately pause the trading bot. All active trading will stop, but open positions will remain.</p>
+            </div>
+            
+            <div class="kill-switch-modal-actions">
+                <button type="button" id="kill-switch-cancel" class="kill-switch-btn-cancel">
+                    Cancel
+                </button>
+                <button type="button" id="kill-switch-confirm" class="kill-switch-btn-confirm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    Confirm Emergency Stop
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Master Kill Switch Styles */
+        .master-kill-switch {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+            border: 3px solid #7F1D1D;
+            border-radius: 50%;
+            box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4), 0 0 0 0 rgba(220, 38, 38, 0.7);
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: killSwitchPulse 2s ease-in-out infinite;
+        }
+
+        .master-kill-switch:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(220, 38, 38, 0.6), 0 0 0 8px rgba(220, 38, 38, 0.2);
+        }
+
+        .master-kill-switch:active {
+            transform: scale(0.95);
+        }
+
+        .master-kill-switch.activated {
+            background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+            border-color: #374151;
+            animation: none;
+        }
+
+        .master-kill-switch.activated .kill-switch-pulse {
+            display: none;
+        }
+
+        .kill-switch-icon {
+            width: 28px;
+            height: 28px;
+            stroke: white;
+            margin-bottom: 2px;
+        }
+
+        .kill-switch-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .kill-switch-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(220, 38, 38, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes killSwitchPulse {
+            0%, 100% {
+                box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4), 0 0 0 0 rgba(220, 38, 38, 0.7);
+            }
+            50% {
+                box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4), 0 0 0 12px rgba(220, 38, 38, 0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        /* Modal Styles */
+        .kill-switch-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .kill-switch-modal.hidden {
+            display: none;
+        }
+
+        .kill-switch-modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 480px;
+            width: 100%;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .kill-switch-modal-header {
+            padding: 32px 24px 24px;
+            text-align: center;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .kill-switch-modal-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            stroke: #DC2626;
+        }
+
+        .kill-switch-modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .kill-switch-modal-desc {
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.6;
+        }
+
+        .kill-switch-modal-actions {
+            padding: 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .kill-switch-btn-cancel {
+            flex: 1;
+            padding: 12px 24px;
+            background: #F3F4F6;
+            color: #374151;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .kill-switch-btn-cancel:hover {
+            background: #E5E7EB;
+        }
+
+        .kill-switch-btn-confirm {
+            flex: 2;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .kill-switch-btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(220, 38, 38, 0.3);
+        }
+
+        .kill-switch-btn-confirm:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .master-kill-switch {
+                width: 56px;
+                height: 56px;
+                bottom: 80px;
+                right: 16px;
+            }
+
+            .kill-switch-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .kill-switch-label {
+                font-size: 9px;
+            }
+        }
+
+        /* Hide on very small screens when mobile nav is present */
+        @media (max-width: 640px) and (max-height: 600px) {
+            .master-kill-switch {
+                width: 48px;
+                height: 48px;
+                bottom: 72px;
+            }
+        }
+        
+        /* ===========================
+           NOTIFICATION CENTER STYLES
+           =========================== */
+        .notification-dropdown {
+            position: fixed;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+            z-index: 9998;
+            animation: slideDown 0.2s ease-out;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notification-dropdown-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .notification-dropdown-list {
+            overflow-y: auto;
+            max-height: 400px;
+            padding: 4px;
+        }
+
+        .notification-dropdown-empty {
+            padding: 48px 20px;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        .notification-item {
+            padding: 12px 16px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .notification-item:hover {
+            background: #f3f4f6;
+        }
+
+        .notification-item.unread {
+            background: #eff6ff;
+        }
+
+        .notification-item.unread:hover {
+            background: #dbeafe;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #111827;
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            color: #6b7280;
+            font-size: 0.8125rem;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .notification-time {
+            color: #9ca3af;
+            font-size: 0.75rem;
+        }
+
+        .notification-unread-dot {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 6px;
+        }
+    </style>
+    
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='account-selector.js') }}"></script>
+    <script src="{{ url_for('static', filename='auth-check.js') }}"></script>
+    <script src="{{ url_for('static', filename='cache-loader.js') }}"></script>
+    <script src="{{ url_for('static', filename='deriv-websocket.js') }}"></script>
+    <script src="{{ url_for('static', filename='notification-center.js') }}"></script>
+    
+    <!-- Master Kill Switch Script -->
+    <script>
+        // Master Kill Switch Handler
+        (function() {
+            let killSwitchManager = null;
+            const killSwitchButton = document.getElementById('master-kill-switch');
+            const killSwitchModal = document.getElementById('kill-switch-modal');
+            const confirmButton = document.getElementById('kill-switch-confirm');
+            const cancelButton = document.getElementById('kill-switch-cancel');
+
+            // Load bot-status.js dynamically if not already loaded
+            function loadBotManager(callback) {
+                if (typeof BotStatusManager !== 'undefined') {
+                    callback();
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = "{{ url_for('static', filename='bot-status.js') }}";
+                script.onload = callback;
+                script.onerror = () => {
+                    console.error('Failed to load bot-status.js for kill switch');
+                };
+                document.head.appendChild(script);
+            }
+
+            // Initialize bot manager
+            function initKillSwitch() {
+                loadBotManager(() => {
+                    killSwitchManager = new BotStatusManager({
+                        onUpdate: (data) => {
+                            updateKillSwitchState(data.status);
+                        },
+                        onError: (error) => {
+                            console.error('Kill switch error:', error);
+                        }
+                    });
+
+                    // Start monitoring bot status
+                    killSwitchManager.startPolling();
+                });
+            }
+
+            // Update kill switch appearance based on bot status
+            function updateKillSwitchState(status) {
+                if (status === 'stopped' || status === 'paused') {
+                    killSwitchButton.classList.add('activated');
+                    killSwitchButton.title = 'Bot Stopped - Click to view bot settings';
+                } else {
+                    killSwitchButton.classList.remove('activated');
+                    killSwitchButton.title = 'Emergency Stop - Pause Bot Immediately';
+                }
+            }
+
+            // Show confirmation modal
+            function showKillSwitchModal() {
+                killSwitchModal.classList.remove('hidden');
+            }
+
+            // Hide confirmation modal
+            function hideKillSwitchModal() {
+                killSwitchModal.classList.add('hidden');
+            }
+
+            // Execute emergency stop
+            async function executeEmergencyStop() {
+                if (!killSwitchManager) {
+                    console.error('Bot manager not initialized');
+                    alert('Unable to stop bot. Please try again.');
+                    return;
+                }
+
+                try {
+                    const currentStatus = killSwitchManager.getCurrentStatus();
+
+                    // If already stopped, redirect to bot page
+                    if (currentStatus === 'stopped' || currentStatus === 'paused') {
+                        window.location.href = '/bot';
+                        return;
+                    }
+
+                    // Disable button to prevent double-click
+                    confirmButton.disabled = true;
+                    confirmButton.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Stopping...';
+
+                    // Execute pause (immediate stop without closing positions)
+                    await killSwitchManager.pause();
+
+                    // Log emergency stop
+                    console.log('[EMERGENCY STOP] Bot paused via master kill switch at', new Date().toISOString());
+
+                    // Show success message
+                    alert('✅ Emergency Stop Activated\n\nBot has been paused. All active trading stopped.\nOpen positions remain active.');
+
+                    // Hide modal
+                    hideKillSwitchModal();
+
+                    // Update button state
+                    killSwitchButton.classList.add('activated');
+
+                } catch (error) {
+                    console.error('Emergency stop failed:', error);
+                    alert('⚠️ Failed to stop bot: ' + error.message + '\n\nPlease try again or visit the Bot Management page.');
+                } finally {
+                    // Re-enable button
+                    confirmButton.disabled = false;
+                    confirmButton.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> Confirm Emergency Stop';
+                }
+            }
+
+            // Event listeners
+            killSwitchButton.addEventListener('click', () => {
+                const currentStatus = killSwitchManager?.getCurrentStatus();
+                
+                // If bot is stopped/paused, redirect to bot page
+                if (currentStatus === 'stopped' || currentStatus === 'paused') {
+                    window.location.href = '/bot';
+                } else {
+                    // Show confirmation modal
+                    showKillSwitchModal();
+                }
+            });
+
+            confirmButton.addEventListener('click', executeEmergencyStop);
+            cancelButton.addEventListener('click', hideKillSwitchModal);
+
+            // Close modal on outside click
+            killSwitchModal.addEventListener('click', (e) => {
+                if (e.target === killSwitchModal) {
+                    hideKillSwitchModal();
+                }
+            });
+
+            // Close modal on ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !killSwitchModal.classList.contains('hidden')) {
+                    hideKillSwitchModal();
+                }
+            });
+
+            // Initialize on page load
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initKillSwitch);
+            } else {
+                initKillSwitch();
+            }
+
+            // Cleanup on page unload
+            window.addEventListener('beforeunload', () => {
+                if (killSwitchManager) {
+                    killSwitchManager.stopPolling();
+                }
+            });
+        })();
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,708 @@
+{% extends "base.html" %}
+
+{% block title %}Bot Management - Deriv Bot{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pb-20 lg:pb-8">
+    <!-- Custom gradient background -->
+    <div class="bot-bg fixed inset-0 -z-10"></div>
+    
+    <!-- Header with Emergency Stop -->
+    <div class="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-2xl font-bold text-gray-900">Bot Management</h1>
+                <button id="emergency-stop-btn" class="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors shadow-lg hidden">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    <span>EMERGENCY STOP</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
+        <!-- Bot Status Card -->
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div id="status-indicator" class="w-4 h-4 rounded-full bg-gray-400 animate-pulse"></div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900" id="bot-status-text">Inactive</h2>
+                        <p class="text-sm text-gray-600" id="bot-status-subtitle">Bot is not running</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button id="start-bot-btn" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors shadow-md hidden">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Start Bot
+                    </button>
+                    <button id="pause-bot-btn" class="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-bold rounded-lg transition-colors shadow-md hidden">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Pause
+                    </button>
+                    <button id="resume-bot-btn" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-md hidden">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                        </svg>
+                        Resume
+                    </button>
+                    <button id="stop-bot-btn" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors shadow-md hidden">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/>
+                        </svg>
+                        Stop
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-blue-50 rounded-xl p-4">
+                    <p class="text-sm text-blue-600 font-semibold mb-1">Total Trades</p>
+                    <p class="text-2xl font-bold text-blue-900" id="stat-total-trades">0</p>
+                </div>
+                <div class="bg-green-50 rounded-xl p-4">
+                    <p class="text-sm text-green-600 font-semibold mb-1">Win Rate</p>
+                    <p class="text-2xl font-bold text-green-900" id="stat-win-rate">0%</p>
+                </div>
+                <div class="bg-purple-50 rounded-xl p-4">
+                    <p class="text-sm text-purple-600 font-semibold mb-1">Total Profit</p>
+                    <p class="text-2xl font-bold text-purple-900" id="stat-total-profit">$0.00</p>
+                </div>
+                <div class="bg-orange-50 rounded-xl p-4">
+                    <p class="text-sm text-orange-600 font-semibold mb-1">Active Systems</p>
+                    <p class="text-2xl font-bold text-orange-900" id="stat-active-systems">0</p>
+                </div>
+            </div>
+
+            <!-- Real-time Info -->
+            <div id="realtime-info" class="hidden space-y-2 p-4 bg-gray-50 rounded-xl">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600">WebSocket:</span>
+                    <span id="ws-status" class="font-semibold">Disconnected</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600">Open Positions:</span>
+                    <span id="open-positions" class="font-semibold">0</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600">Uptime:</span>
+                    <span id="uptime" class="font-semibold">-</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600">Last Check:</span>
+                    <span id="last-check" class="font-semibold">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Card -->
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Configuration</h3>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="max-concurrent-trades" class="block text-sm font-bold text-gray-700 mb-2">
+                        Max Concurrent Trades
+                    </label>
+                    <input 
+                        type="number" 
+                        id="max-concurrent-trades" 
+                        min="1" 
+                        max="10"
+                        value="3"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    >
+                </div>
+                
+                <div>
+                    <label for="check-interval" class="block text-sm font-bold text-gray-700 mb-2">
+                        Check Interval (seconds)
+                    </label>
+                    <input 
+                        type="number" 
+                        id="check-interval" 
+                        min="1" 
+                        max="60"
+                        value="5"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    >
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 mb-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="enable-notifications" class="w-5 h-5 text-blue-600 rounded">
+                    <span class="text-sm font-medium text-gray-700">Enable Notifications</span>
+                </label>
+                
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="auto-restart" class="w-5 h-5 text-blue-600 rounded">
+                    <span class="text-sm font-medium text-gray-700">Auto-restart on Error</span>
+                </label>
+            </div>
+
+            <button id="save-config-btn" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors">
+                Save Configuration
+            </button>
+        </div>
+
+        <!-- Trading Systems Selection -->
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900">Active Trading Systems</h3>
+                <a href="/trading-system" class="text-sm text-blue-600 hover:text-blue-700 font-semibold">
+                    Manage Systems →
+                </a>
+            </div>
+            
+            <div id="trading-systems-list" class="space-y-3">
+                <!-- Trading systems will be loaded here -->
+                <div class="text-center py-8 text-gray-500">
+                    <svg class="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <p class="font-medium">Loading trading systems...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Logs -->
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-gray-100">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900">Activity Logs</h3>
+                <div class="flex gap-2">
+                    <select id="log-filter" class="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-medium">
+                        <option value="">All Events</option>
+                        <option value="bot_start">Bot Start</option>
+                        <option value="bot_stop">Bot Stop</option>
+                        <option value="trade_opened">Trades Opened</option>
+                        <option value="trade_closed">Trades Closed</option>
+                        <option value="signal_detected">Signals Detected</option>
+                        <option value="error">Errors</option>
+                    </select>
+                    <button id="refresh-logs-btn" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="logs-container" class="space-y-2 max-h-96 overflow-y-auto">
+                <!-- Logs will be loaded here -->
+                <div class="text-center py-8 text-gray-500">
+                    <p class="font-medium">No logs yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div class="flex justify-around items-center h-16">
+            <a href="/dashboard" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="/chart" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span class="text-xs mt-1">Chart</span>
+            </a>
+            <a href="/trade" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <span class="text-xs mt-1">Trade</span>
+            </a>
+            <a href="/history" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-xs mt-1">History</span>
+            </a>
+            <a href="/settings" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-xs mt-1">Settings</span>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<style>
+.bot-bg {
+    background: linear-gradient(180deg, #EDE9FE 0%, #FEF3C7 40%, #D1FAE5 100%);
+    opacity: 0.3;
+}
+
+/* Log entry styles */
+.log-entry {
+    padding: 0.75rem;
+    border-left: 4px solid #e5e7eb;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.log-entry:hover {
+    background: #f3f4f6;
+}
+
+.log-entry.log-info {
+    border-left-color: #3b82f6;
+}
+
+.log-entry.log-warning {
+    border-left-color: #f59e0b;
+}
+
+.log-entry.log-error {
+    border-left-color: #ef4444;
+}
+
+.log-entry.log-debug {
+    border-left-color: #6b7280;
+}
+
+/* Status indicator animation */
+@keyframes pulse-ring {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.status-pulse::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: inherit;
+    animation: pulse-ring 2s ease-out infinite;
+}
+</style>
+
+<script src="/static/bot-status.js"></script>
+<script>
+let currentBotData = null;
+let tradingSystems = [];
+let selectedSystemIds = [];
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    loadConfiguration();
+    loadTradingSystems();
+    loadLogs();
+    
+    // Listen for bot status updates
+    window.botStatusManager.addListener(handleBotStatusUpdate);
+});
+
+// Handle bot status updates
+function handleBotStatusUpdate(data) {
+    if (data.type === 'status_update') {
+        currentBotData = data.bot;
+        updateUI(data);
+    }
+}
+
+// Update UI based on bot status
+function updateUI(data) {
+    const bot = data.bot;
+    const isRunning = data.isRunning;
+    const status = bot.status;
+    
+    // Update status indicator
+    const indicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('bot-status-text');
+    const statusSubtitle = document.getElementById('bot-status-subtitle');
+    
+    // Reset classes
+    indicator.className = 'w-4 h-4 rounded-full relative';
+    
+    switch (status) {
+        case 'running':
+            indicator.classList.add('bg-green-500', 'status-pulse');
+            statusText.textContent = 'Running';
+            statusSubtitle.textContent = 'Bot is actively trading';
+            break;
+        case 'paused':
+            indicator.classList.add('bg-yellow-500');
+            statusText.textContent = 'Paused';
+            statusSubtitle.textContent = 'Bot is temporarily stopped';
+            break;
+        case 'starting':
+            indicator.classList.add('bg-blue-500', 'animate-pulse');
+            statusText.textContent = 'Starting';
+            statusSubtitle.textContent = 'Bot is initializing...';
+            break;
+        case 'stopping':
+            indicator.classList.add('bg-orange-500', 'animate-pulse');
+            statusText.textContent = 'Stopping';
+            statusSubtitle.textContent = 'Bot is shutting down...';
+            break;
+        case 'error':
+            indicator.classList.add('bg-red-500', 'animate-pulse');
+            statusText.textContent = 'Error';
+            statusSubtitle.textContent = bot.last_error || 'Bot encountered an error';
+            break;
+        default:
+            indicator.classList.add('bg-gray-400');
+            statusText.textContent = 'Inactive';
+            statusSubtitle.textContent = 'Bot is not running';
+    }
+    
+    // Update buttons
+    updateButtons(status);
+    
+    // Update statistics
+    updateStatistics(bot);
+    
+    // Update real-time info
+    if (isRunning && data.executor) {
+        updateRealtimeInfo(data.executor);
+    }
+}
+
+// Update control buttons
+function updateButtons(status) {
+    const startBtn = document.getElementById('start-bot-btn');
+    const stopBtn = document.getElementById('stop-bot-btn');
+    const pauseBtn = document.getElementById('pause-bot-btn');
+    const resumeBtn = document.getElementById('resume-bot-btn');
+    const emergencyBtn = document.getElementById('emergency-stop-btn');
+    
+    // Hide all first
+    [startBtn, stopBtn, pauseBtn, resumeBtn].forEach(btn => btn.classList.add('hidden'));
+    
+    switch (status) {
+        case 'inactive':
+            startBtn.classList.remove('hidden');
+            emergencyBtn.classList.add('hidden');
+            break;
+        case 'running':
+            pauseBtn.classList.remove('hidden');
+            stopBtn.classList.remove('hidden');
+            emergencyBtn.classList.remove('hidden');
+            break;
+        case 'paused':
+            resumeBtn.classList.remove('hidden');
+            stopBtn.classList.remove('hidden');
+            emergencyBtn.classList.remove('hidden');
+            break;
+        case 'error':
+            startBtn.classList.remove('hidden');
+            emergencyBtn.classList.add('hidden');
+            break;
+    }
+}
+
+// Update statistics
+function updateStatistics(bot) {
+    const stats = bot.statistics || {};
+    const total = stats.total_trades || 0;
+    const winning = stats.winning_trades || 0;
+    const winRate = total > 0 ? (winning / total * 100).toFixed(1) : 0;
+    
+    document.getElementById('stat-total-trades').textContent = total;
+    document.getElementById('stat-win-rate').textContent = `${winRate}%`;
+    document.getElementById('stat-total-profit').textContent = `$${(stats.total_profit || 0).toFixed(2)}`;
+    document.getElementById('stat-active-systems').textContent = (bot.active_trading_systems || []).length;
+}
+
+// Update real-time info
+function updateRealtimeInfo(executor) {
+    const realtimeInfo = document.getElementById('realtime-info');
+    realtimeInfo.classList.remove('hidden');
+    
+    document.getElementById('ws-status').textContent = executor.ws_connected ? '✓ Connected' : '✗ Disconnected';
+    document.getElementById('ws-status').className = executor.ws_connected ? 'font-semibold text-green-600' : 'font-semibold text-red-600';
+    
+    document.getElementById('open-positions').textContent = executor.open_positions_count || 0;
+    
+    const uptimeSeconds = executor.uptime_seconds || 0;
+    const hours = Math.floor(uptimeSeconds / 3600);
+    const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+    document.getElementById('uptime').textContent = `${hours}h ${minutes}m`;
+    
+    if (executor.last_check_time) {
+        const lastCheck = new Date(executor.last_check_time);
+        document.getElementById('last-check').textContent = lastCheck.toLocaleTimeString();
+    }
+}
+
+// Load configuration
+function loadConfiguration() {
+    if (!currentBotData) return;
+    
+    const config = currentBotData.config || {};
+    document.getElementById('max-concurrent-trades').value = config.max_concurrent_trades || 3;
+    document.getElementById('check-interval').value = config.check_interval_seconds || 5;
+    document.getElementById('enable-notifications').checked = config.enable_notifications !== false;
+    document.getElementById('auto-restart').checked = config.auto_restart_on_error === true;
+}
+
+// Save configuration
+document.getElementById('save-config-btn').addEventListener('click', async () => {
+    const config = {
+        max_concurrent_trades: parseInt(document.getElementById('max-concurrent-trades').value),
+        check_interval_seconds: parseInt(document.getElementById('check-interval').value),
+        enable_notifications: document.getElementById('enable-notifications').checked,
+        auto_restart_on_error: document.getElementById('auto-restart').checked
+    };
+    
+    const result = await window.botStatusManager.updateConfig(config);
+    
+    if (result.success) {
+        alert('Configuration saved successfully!');
+    } else {
+        alert(`Failed to save configuration: ${result.message}`);
+    }
+});
+
+// Load trading systems
+async function loadTradingSystems() {
+    try {
+        const response = await fetch('/api/trading-systems');
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            tradingSystems = data.trading_systems || [];
+            renderTradingSystems();
+        }
+    } catch (error) {
+        console.error('Failed to load trading systems:', error);
+    }
+}
+
+// Render trading systems
+function renderTradingSystems() {
+    const container = document.getElementById('trading-systems-list');
+    
+    if (tradingSystems.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <p class="font-medium mb-2">No trading systems found</p>
+                <a href="/trading-system/new" class="text-blue-600 hover:text-blue-700 font-semibold">Create your first trading system →</a>
+            </div>
+        `;
+        return;
+    }
+    
+    // Get currently active system IDs
+    selectedSystemIds = currentBotData?.active_trading_systems || [];
+    
+    container.innerHTML = tradingSystems.map(system => `
+        <label class="flex items-center gap-3 p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 transition-colors">
+            <input 
+                type="checkbox" 
+                class="w-5 h-5 text-blue-600 rounded"
+                value="${system.id}"
+                ${selectedSystemIds.includes(system.id) ? 'checked' : ''}
+                onchange="toggleSystem('${system.id}')"
+            >
+            <div class="flex-1">
+                <p class="font-semibold text-gray-900">${system.name}</p>
+                <p class="text-sm text-gray-600">${formatEntryType(system.entry_strategy_type)} + ${formatPositionType(system.position_sizing_type)}</p>
+            </div>
+            <span class="px-3 py-1 text-xs font-semibold rounded-full ${system.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">
+                ${system.is_active ? 'Active' : 'Inactive'}
+            </span>
+        </label>
+    `).join('');
+}
+
+// Toggle system selection
+async function toggleSystem(systemId) {
+    if (selectedSystemIds.includes(systemId)) {
+        selectedSystemIds = selectedSystemIds.filter(id => id !== systemId);
+    } else {
+        selectedSystemIds.push(systemId);
+    }
+    
+    // Update immediately
+    const result = await window.botStatusManager.setTradingSystems(selectedSystemIds);
+    
+    if (!result.success) {
+        alert(`Failed to update trading systems: ${result.message}`);
+        // Reload to revert
+        await loadTradingSystems();
+    }
+}
+
+// Format helper functions
+function formatEntryType(type) {
+    const types = {
+        'manual': 'Manual',
+        'rsi': 'RSI',
+        'macd': 'MACD',
+        'ema_cross': 'EMA Cross',
+        'bb': 'Bollinger Bands',
+        'sma': 'SMA',
+        'tick_analysis': 'Tick Analysis',
+        'price_based': 'Price-Based'
+    };
+    return types[type] || type;
+}
+
+function formatPositionType(type) {
+    const types = {
+        'fixed': 'Fixed',
+        'martingale': 'Martingale',
+        'anti_martingale': 'Anti-Martingale',
+        'compound': 'Compound',
+        'fibonacci': 'Fibonacci',
+        'dalembert': "D'Alembert"
+    };
+    return types[type] || type;
+}
+
+// Load logs
+async function loadLogs(eventType = null) {
+    const result = await window.botStatusManager.getLogs(50, eventType);
+    
+    if (result.success) {
+        renderLogs(result.logs);
+    }
+}
+
+// Render logs
+function renderLogs(logs) {
+    const container = document.getElementById('logs-container');
+    
+    if (logs.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <p class="font-medium">No logs found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = logs.map(log => {
+        const date = new Date(log.created_at);
+        return `
+            <div class="log-entry log-${log.log_level}">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900 text-sm">${log.message}</p>
+                        <p class="text-xs text-gray-500 mt-1">${log.event_type} • ${date.toLocaleString()}</p>
+                    </div>
+                    <span class="px-2 py-1 text-xs font-semibold rounded ${getLogLevelColor(log.log_level)}">
+                        ${log.log_level.toUpperCase()}
+                    </span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Get log level color
+function getLogLevelColor(level) {
+    const colors = {
+        'debug': 'bg-gray-100 text-gray-700',
+        'info': 'bg-blue-100 text-blue-700',
+        'warning': 'bg-yellow-100 text-yellow-700',
+        'error': 'bg-red-100 text-red-700',
+        'critical': 'bg-red-200 text-red-900'
+    };
+    return colors[level] || 'bg-gray-100 text-gray-700';
+}
+
+// Log filter change
+document.getElementById('log-filter').addEventListener('change', (e) => {
+    loadLogs(e.target.value || null);
+});
+
+// Refresh logs
+document.getElementById('refresh-logs-btn').addEventListener('click', () => {
+    const eventType = document.getElementById('log-filter').value || null;
+    loadLogs(eventType);
+});
+
+// Bot control buttons
+document.getElementById('start-bot-btn').addEventListener('click', async () => {
+    if (selectedSystemIds.length === 0) {
+        alert('Please select at least one trading system before starting the bot.');
+        return;
+    }
+    
+    if (!confirm('Start the trading bot? It will begin automated trading based on your configured systems.')) {
+        return;
+    }
+    
+    const result = await window.botStatusManager.startBot();
+    
+    if (result.success) {
+        // Status will update via manager
+    } else {
+        alert(`Failed to start bot: ${result.message}`);
+    }
+});
+
+document.getElementById('stop-bot-btn').addEventListener('click', async () => {
+    if (!confirm('Stop the trading bot? All monitoring will cease.')) {
+        return;
+    }
+    
+    const result = await window.botStatusManager.stopBot();
+    
+    if (!result.success) {
+        alert(`Failed to stop bot: ${result.message}`);
+    }
+});
+
+document.getElementById('pause-bot-btn').addEventListener('click', async () => {
+    const result = await window.botStatusManager.pauseBot();
+    
+    if (!result.success) {
+        alert(`Failed to pause bot: ${result.message}`);
+    }
+});
+
+document.getElementById('resume-bot-btn').addEventListener('click', async () => {
+    const result = await window.botStatusManager.resumeBot();
+    
+    if (!result.success) {
+        alert(`Failed to resume bot: ${result.message}`);
+    }
+});
+
+document.getElementById('emergency-stop-btn').addEventListener('click', async () => {
+    if (!confirm('⚠️ EMERGENCY STOP\n\nThis will immediately stop the bot and all trading. Continue?')) {
+        return;
+    }
+    
+    const result = await window.botStatusManager.stopBot();
+    
+    if (result.success) {
+        alert('Bot stopped successfully.');
+    } else {
+        alert(`Failed to stop bot: ${result.message}`);
+    }
+});
+</script>
+{% endblock %}

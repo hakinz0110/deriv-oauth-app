@@ -1,328 +1,320 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTS Trade - Chart</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
+{% block title %}Chart Analysis - Deriv Bot{% endblock %}
 
-        .container {
-            width: 100%;
-            max-width: 428px;
-            margin: 0 auto;
-            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-        }
-
-        .header-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #000;
-        }
-
-        .timeframe-selector {
-            display: flex;
-            gap: 8px;
-        }
-
-        .timeframe-btn {
-            padding: 6px 12px;
-            border-radius: 12px;
-            border: none;
-            background: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-        }
-
-        .timeframe-btn.active {
-            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
-            color: #000;
-        }
-
-        .content {
-            padding: 0 20px;
-        }
-
-        .asset-selector {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .asset-info h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 4px;
-        }
-
-        .asset-price {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .price {
-            font-size: 18px;
-            font-weight: 700;
-            color: #000;
-        }
-
-        .change {
-            font-size: 13px;
-            font-weight: 600;
-            color: #4CAF50;
-        }
-
-        .change.negative {
-            color: #E74C3C;
-        }
-
-        .dropdown-icon {
-            width: 20px;
-            height: 20px;
-        }
-
-        .chart-card {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            height: 400px;
-        }
-
-        .chart-placeholder {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to top, rgba(76, 175, 80, 0.05) 0%, transparent 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-            font-size: 14px;
-        }
-
-        .indicators-card {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .indicators-header {
-            font-size: 15px;
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 12px;
-        }
-
-        .indicator-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-        }
-
-        .indicator-item:last-child {
-            border-bottom: none;
-        }
-
-        .indicator-name {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .indicator-value {
-            font-size: 14px;
-            font-weight: 600;
-            color: #000;
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 428px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 20px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            color: #999;
-            text-decoration: none;
-        }
-
-        .nav-item.active {
-            color: #D4AF37;
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            stroke: #999;
-            transition: stroke 0.2s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            stroke: #D4AF37;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1 class="header-title">Chart</h1>
-            <div class="timeframe-selector">
-                <button class="timeframe-btn">1H</button>
-                <button class="timeframe-btn active">4H</button>
-                <button class="timeframe-btn">1D</button>
-            </div>
-        </div>
-
-        <!-- Content -->
-        <div class="content">
-            <!-- Asset Selector -->
-            <div class="asset-selector">
-                <div class="asset-info">
-                    <h3 id="asset-name">N/A</h3>
-                    <div class="asset-price">
-                        <span class="price" id="asset-price">N/A</span>
-                        <span class="change" id="asset-change">N/A</span>
+{% block content %}
+<div class="min-h-screen pb-20 lg:pb-8">
+    <!-- Custom gradient background -->
+    <div class="chart-bg fixed inset-0 -z-10"></div>
+    
+    <!-- Header -->
+    <div class="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-2xl font-bold text-gray-900">Chart</h1>
+                <div class="flex items-center gap-2">
+                    <div class="timeframe-selector flex gap-1 sm:gap-2">
+                        <button class="timeframe-btn" data-timeframe="1H">1H</button>
+                        <button class="timeframe-btn active" data-timeframe="4H">4H</button>
+                        <button class="timeframe-btn" data-timeframe="1D">1D</button>
                     </div>
                 </div>
-                <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
             </div>
-
-            <!-- Chart Card -->
-            <div class="chart-card">
-                <div class="chart-placeholder">
-                    Chart will be displayed here
-                </div>
-            </div>
-
-            <!-- Indicators Card -->
-            <div class="indicators-card">
-                <div class="indicators-header">Technical Indicators</div>
-                <div class="indicator-item">
-                    <span class="indicator-name">RSI (14)</span>
-                    <span class="indicator-value">N/A</span>
-                </div>
-                <div class="indicator-item">
-                    <span class="indicator-name">MACD</span>
-                    <span class="indicator-value">N/A</span>
-                </div>
-                <div class="indicator-item">
-                    <span class="indicator-name">Moving Average (50)</span>
-                    <span class="indicator-value">N/A</span>
-                </div>
-                <div class="indicator-item">
-                    <span class="indicator-name">Bollinger Bands</span>
-                    <span class="indicator-value">N/A</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <a href="/dashboard" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-            </a>
-            <a href="/chart" class="nav-item active">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                </svg>
-            </a>
-            <a href="/trade" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="16"></line>
-                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-            </a>
-            <a href="/history" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-            </a>
-            <a href="/settings" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v6m0 6v6m5.6-14.6l-4.2 4.2m-2.8 2.8l-4.2 4.2M23 12h-6m-6 0H1m20.6 5.6l-4.2-4.2m-2.8-2.8l-4.2-4.2"></path>
-                </svg>
-            </a>
         </div>
     </div>
 
-    <script>
-        // Timeframe button handlers
-        const timeframeBtns = document.querySelectorAll('.timeframe-btn');
-        timeframeBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                timeframeBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
+        <!-- Asset Selection Card -->
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-4 mb-4 border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-gray-900 mb-1" id="asset-name">R_100</h3>
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl sm:text-3xl font-bold text-gray-900" id="asset-price">--</span>
+                        <span class="text-sm font-semibold" id="asset-change">--</span>
+                    </div>
+                </div>
+                <button type="button" id="asset-selector-btn" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Chart -->
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-4 mb-4 border border-gray-100">
+            <div id="chart-container" class="h-80 sm:h-96 lg:h-[32rem]"></div>
+        </div>
+
+        <!-- Technical Indicators -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Indicators Card -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-4 border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    Technical Indicators
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="text-sm text-gray-600">RSI (14)</span>
+                        <span class="text-sm font-bold text-gray-900" id="rsi-value">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="text-sm text-gray-600">MACD</span>
+                        <span class="text-sm font-bold text-gray-900" id="macd-value">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="text-sm text-gray-600">Moving Average (50)</span>
+                        <span class="text-sm font-bold text-gray-900" id="ma-value">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="text-sm text-gray-600">Bollinger Bands</span>
+                        <span class="text-sm font-bold text-gray-900" id="bb-value">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Info Card -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-4 border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Market Information
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="text-sm text-gray-600">Open</span>
+                        <span class="text-sm font-bold text-gray-900" id="open-price">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="text-sm text-gray-600">High</span>
+                        <span class="text-sm font-bold text-green-600" id="high-price">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="text-sm text-gray-600">Low</span>
+                        <span class="text-sm font-bold text-red-600" id="low-price">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="text-sm text-gray-600">Volume</span>
+                        <span class="text-sm font-bold text-gray-900" id="volume">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div class="flex justify-around items-center h-16">
+            <a href="/dashboard" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="/chart" class="flex flex-col items-center justify-center flex-1 text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span class="text-xs mt-1 font-semibold">Chart</span>
+            </a>
+            <a href="/trade" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <span class="text-xs mt-1">Trade</span>
+            </a>
+            <a href="/history" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-xs mt-1">History</span>
+            </a>
+            <a href="/settings" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-xs mt-1">Settings</span>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<style>
+.chart-bg {
+    background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+    opacity: 0.3;
+}
+
+.timeframe-selector {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.timeframe-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.timeframe-btn:hover {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.timeframe-btn.active {
+    background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+    color: white;
+}
+
+@media (min-width: 640px) {
+    .timeframe-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+}
+</style>
+
+<script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+let chart = null;
+let candlestickSeries = null;
+let ws = null;
+let currentSymbol = 'R_100';
+let currentTimeframe = '4H';
+
+// Initialize chart
+function initChart() {
+    const chartContainer = document.getElementById('chart-container');
+    
+    chart = LightweightCharts.createChart(chartContainer, {
+        layout: {
+            background: { color: 'transparent' },
+            textColor: '#333',
+        },
+        grid: {
+            vertLines: { color: '#e1e1e1' },
+            horzLines: { color: '#e1e1e1' },
+        },
+        width: chartContainer.clientWidth,
+        height: chartContainer.clientHeight,
+        timeScale: {
+            timeVisible: true,
+            secondsVisible: false,
+        },
+    });
+
+    candlestickSeries = chart.addCandlestickSeries({
+        upColor: '#26a69a',
+        downColor: '#ef5350',
+        borderVisible: false,
+        wickUpColor: '#26a69a',
+        wickDownColor: '#ef5350',
+    });
+
+    // Handle resize
+    window.addEventListener('resize', () => {
+        chart.applyOptions({
+            width: chartContainer.clientWidth,
+            height: chartContainer.clientHeight
         });
+    });
+}
 
-        // Load chart data
-        async function loadChartData() {
-            // TODO: Integrate chart library (TradingView, Chart.js, etc.)
-        }
+// Initialize WebSocket for real-time data
+async function initWebSocket() {
+    try {
+        const response = await fetch('/market-data/url');
+        const data = await response.json();
+        
+        ws = new WebSocket(data.websocket_url);
+        
+        ws.onopen = () => {
+            console.log('WebSocket connected');
+            subscribeTicks(currentSymbol);
+        };
+        
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            
+            if (data.tick) {
+                handleTickUpdate(data.tick);
+            }
+            
+            if (data.error) {
+                console.error('WebSocket error:', data.error);
+            }
+        };
+        
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+        
+        ws.onclose = () => {
+            console.log('WebSocket disconnected');
+            setTimeout(initWebSocket, 5000);
+        };
+        
+    } catch (error) {
+        console.error('Failed to initialize WebSocket:', error);
+    }
+}
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadChartData();
-        });
-    </script>
-</body>
-</html>
+// Subscribe to tick stream
+function subscribeTicks(symbol) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            ticks: symbol,
+            subscribe: 1
+        }));
+    }
+}
 
+// Handle tick update
+function handleTickUpdate(tick) {
+    const price = parseFloat(tick.quote);
+    const time = tick.epoch;
+    
+    // Update price display
+    document.getElementById('asset-price').textContent = price.toFixed(2);
+    document.getElementById('asset-name').textContent = tick.symbol || currentSymbol;
+    
+    // Update chart (for real candlestick data, you'd aggregate ticks)
+    // This is a simplified version using line series approach
+    // TODO: Implement proper candlestick aggregation for selected timeframe
+}
+
+// Timeframe button handlers
+document.querySelectorAll('.timeframe-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentTimeframe = this.dataset.timeframe;
+        
+        // TODO: Reload chart data for new timeframe
+        console.log('Timeframe changed to:', currentTimeframe);
+    });
+});
+
+// Initialize on page load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initChart();
+        initWebSocket();
+    });
+} else {
+    initChart();
+    initWebSocket();
+}
+</script>
+{% endblock %}

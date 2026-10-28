@@ -1,321 +1,187 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTS Trade - Account Profile</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
+{% block title %}HTS Trade - Account Profile{% endblock %}
 
-        .container {
-            width: 100%;
-            max-width: 428px;
-            margin: 0 auto;
-            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
+{% block extra_css %}
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    body {
+        background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+    }
+</style>
+{% endblock %}
 
-        .header {
-            display: flex;
-            align-items: center;
-            padding: 16px 20px;
-            gap: 16px;
-        }
+{% block content %}
+<div class="min-h-screen pb-20 md:pb-24 lg:pb-8">
+    <!-- Header -->
+    <div class="flex items-center gap-4 p-4 md:p-5 lg:p-6">
+        <button onclick="history.back()" class="w-8 h-8 md:w-10 md:h-10 bg-white bg-opacity-70 rounded-full flex items-center justify-center hover:bg-opacity-90 transition">
+            <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Account Profile</h1>
+    </div>
 
-        .back-btn {
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: none;
-        }
-
-        .header-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #000;
-        }
-
-        .content {
-            padding: 0 20px;
-        }
-
-        .profile-avatar {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 32px;
-        }
-
-        .avatar-circle {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
-        }
-
-        .info-card {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 20px;
-            padding: 8px 0;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .info-item {
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .info-label {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .info-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: #000;
-        }
-
-        .badge {
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge.demo {
-            background: #E3F2FD;
-            color: #2196F3;
-        }
-
-        .badge.real {
-            background: #E8F5E9;
-            color: #4CAF50;
-        }
-
-        .badge.active {
-            background: #E8F5E9;
-            color: #4CAF50;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #000;
-            margin: 24px 0 12px;
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 428px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 20px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            color: #999;
-            text-decoration: none;
-        }
-
-        .nav-item.active {
-            color: #D4AF37;
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            stroke: #999;
-            transition: stroke 0.2s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            stroke: #D4AF37;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <button class="back-btn" onclick="history.back()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15 18 9 12 15 6"></polyline>
+    <!-- Content Container -->
+    <div class="max-w-4xl mx-auto px-4 md:px-5 lg:px-6">
+        <!-- Profile Avatar -->
+        <div class="flex justify-center mb-8 md:mb-10">
+            <div class="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-400 flex items-center justify-center shadow-2xl">
+                <svg class="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
                 </svg>
-            </button>
-            <h1 class="header-title">Account Profile</h1>
-        </div>
-
-        <!-- Content -->
-        <div class="content">
-            <!-- Profile Avatar -->
-            <div class="profile-avatar">
-                <div class="avatar-circle">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Account Information -->
-            <div class="section-title">Account Information</div>
-            <div class="info-card">
-                <div class="info-item">
-                    <span class="info-label">Account ID</span>
-                    <span class="info-value" id="account-id">N/A</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Account Type</span>
-                    <span class="badge demo" id="account-type">N/A</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Currency</span>
-                    <span class="info-value" id="currency">N/A</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Status</span>
-                    <span class="badge active" id="status">N/A</span>
-                </div>
-            </div>
-
-            <!-- Balance Information -->
-            <div class="section-title">Balance</div>
-            <div class="info-card">
-                <div class="info-item">
-                    <span class="info-label">Current Balance</span>
-                    <span class="info-value" id="balance">N/A</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Total Deposits</span>
-                    <span class="info-value" id="deposits">N/A</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Total Withdrawals</span>
-                    <span class="info-value" id="withdrawals">N/A</span>
-                </div>
-            </div>
-
-            <!-- Trading Statistics -->
-            <div class="section-title">Trading Statistics</div>
-            <div class="info-card">
-                <div class="info-item">
-                    <span class="info-label">Total Trades</span>
-                    <span class="info-value" id="total-trades">N/A</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Win Rate</span>
-                    <span class="info-value" id="win-rate">N/A</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Net P/L</span>
-                    <span class="info-value" id="net-pnl">N/A</span>
-                </div>
             </div>
         </div>
 
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <a href="/dashboard" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-            </a>
-            <a href="/chart" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                </svg>
-            </a>
-            <a href="/trade" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="16"></line>
-                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-            </a>
-            <a href="/history" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-            </a>
-            <a href="/settings" class="nav-item active">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v6m0 6v6m5.6-14.6l-4.2 4.2m-2.8 2.8l-4.2 4.2M23 12h-6m-6 0H1m20.6 5.6l-4.2-4.2m-2.8-2.8l-4.2-4.2"></path>
-                </svg>
-            </a>
+        <!-- Desktop/Tablet Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 lg:gap-6">
+            
+            <!-- Account Information Section -->
+            <div>
+                <h2 class="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">Account Information</h2>
+                <div class="bg-white bg-opacity-85 rounded-2xl md:rounded-3xl shadow-sm overflow-hidden">
+                    <div class="divide-y divide-gray-100">
+                        <div class="flex justify-between items-center p-4 md:p-5">
+                            <span class="text-sm md:text-base text-gray-600">Account ID</span>
+                            <span class="text-sm md:text-base font-semibold text-gray-900" id="account-id">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 md:p-5">
+                            <span class="text-sm md:text-base text-gray-600">Account Type</span>
+                            <span class="px-3 py-1.5 rounded-xl text-xs md:text-sm font-semibold bg-blue-50 text-blue-600" id="account-type-badge">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 md:p-5">
+                            <span class="text-sm md:text-base text-gray-600">Currency</span>
+                            <span class="text-sm md:text-base font-semibold text-gray-900" id="currency">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 md:p-5">
+                            <span class="text-sm md:text-base text-gray-600">Status</span>
+                            <span class="px-3 py-1.5 rounded-xl text-xs md:text-sm font-semibold bg-green-50 text-green-600" id="status">N/A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Balance Information Section -->
+            <div>
+                <h2 class="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">Balance</h2>
+                <div class="bg-white bg-opacity-85 rounded-2xl md:rounded-3xl shadow-sm overflow-hidden">
+                    <div class="divide-y divide-gray-100">
+                        <div class="flex justify-between items-center p-4 md:p-5">
+                            <span class="text-sm md:text-base text-gray-600">Current Balance</span>
+                            <span class="text-sm md:text-base font-semibold text-gray-900" id="balance">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 md:p-5">
+                            <span class="text-sm md:text-base text-gray-600">Total Deposits</span>
+                            <span class="text-sm md:text-base font-semibold text-gray-900" id="deposits">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 md:p-5">
+                            <span class="text-sm md:text-base text-gray-600">Total Withdrawals</span>
+                            <span class="text-sm md:text-base font-semibold text-gray-900" id="withdrawals">N/A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trading Statistics Section (Full Width on Mobile) -->
+            <div class="lg:col-span-2">
+                <h2 class="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">Trading Statistics</h2>
+                <div class="bg-white bg-opacity-85 rounded-2xl md:rounded-3xl shadow-sm overflow-hidden">
+                    <div class="divide-y divide-gray-100">
+                        <div class="flex justify-between items-center p-4 md:p-5">
+                            <span class="text-sm md:text-base text-gray-600">Total Trades</span>
+                            <span class="text-sm md:text-base font-semibold text-gray-900" id="total-trades">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 md:p-5">
+                            <span class="text-sm md:text-base text-gray-600">Win Rate</span>
+                            <span class="text-sm md:text-base font-semibold text-gray-900" id="win-rate">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 md:p-5">
+                            <span class="text-sm md:text-base text-gray-600">Net P/L</span>
+                            <span class="text-sm md:text-base font-semibold text-gray-900" id="net-pnl">N/A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <script>
-        async function loadAccountProfile() {
-            try {
-                const response = await fetch('/accounts/selected');
-                if (response.ok) {
-                    const data = await response.json();
-                    const account = data.selected_account;
+    <!-- Bottom Navigation (Mobile Only) -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white bg-opacity-95 backdrop-blur-sm border-t border-gray-200 flex justify-around px-5 py-3 shadow-lg lg:hidden">
+        <a href="/dashboard" class="flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-600 transition">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        </a>
+        <a href="/chart" class="flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-600 transition">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+        </a>
+        <a href="/trade" class="flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-600 transition">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+        </a>
+        <a href="/history" class="flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-600 transition">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+        </a>
+        <a href="/settings" class="flex flex-col items-center gap-1 text-yellow-600">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 6v6m5.6-14.6l-4.2 4.2m-2.8 2.8l-4.2 4.2M23 12h-6m-6 0H1m20.6 5.6l-4.2-4.2m-2.8-2.8l-4.2-4.2"></path>
+            </svg>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function loadAccountProfile() {
+        try {
+            const response = await fetch('/accounts/selected');
+            if (response.ok) {
+                const data = await response.json();
+                const account = data.selected_account;
+                
+                if (account) {
+                    document.getElementById('account-id').textContent = account.account_id || 'N/A';
+                    document.getElementById('currency').textContent = account.currency || 'N/A';
                     
-                    if (account) {
-                        document.getElementById('account-id').textContent = account.account_id || 'N/A';
-                        document.getElementById('currency').textContent = account.currency || 'N/A';
-                        
-                        const typeEl = document.getElementById('account-type');
-                        typeEl.textContent = account.account_type || 'N/A';
-                        typeEl.className = `badge ${account.account_type === 'real' ? 'real' : 'demo'}`;
-                        
-                        if (account.balance !== undefined) {
-                            document.getElementById('balance').textContent = 
-                                `$${parseFloat(account.balance).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-                        }
+                    const typeEl = document.getElementById('account-type-badge');
+                    const accountType = account.account_type || 'N/A';
+                    typeEl.textContent = accountType;
+                    
+                    if (accountType === 'real') {
+                        typeEl.className = 'px-3 py-1.5 rounded-xl text-xs md:text-sm font-semibold bg-green-50 text-green-600';
+                    } else {
+                        typeEl.className = 'px-3 py-1.5 rounded-xl text-xs md:text-sm font-semibold bg-blue-50 text-blue-600';
                     }
+                    
+                    if (account.balance !== undefined) {
+                        document.getElementById('balance').textContent = 
+                            `$${parseFloat(account.balance).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                    }
+                    
+                    document.getElementById('status').textContent = 'Active';
                 }
-            } catch (error) {
-                console.error('Failed to load account profile:', error);
             }
+        } catch (error) {
+            console.error('Failed to load account profile:', error);
         }
+    }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAccountProfile();
-        });
-    </script>
-</body>
-</html>
-
+    document.addEventListener('DOMContentLoaded', () => {
+        loadAccountProfile();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Select Trading Account - HTS Trade{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    .bg-select-account {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .account-card {
+        transition: all 0.3s ease;
+    }
+    
+    .account-card:hover:not(.disabled) {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    .account-card.selected {
+        border: 3px solid #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-select-account min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">Select Trading Account</h1>
+            <p class="text-white text-opacity-90">Choose an account to start trading</p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+            <p class="text-white mt-4">Loading your accounts...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden bg-red-50 border-2 border-red-200 rounded-2xl p-6 text-center">
+            <svg class="w-12 h-12 text-red-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-red-900 mb-2">Failed to Load Accounts</h3>
+            <p class="text-red-700 mb-4" id="error-message">An error occurred while loading your accounts.</p>
+            <button onclick="window.location.reload()" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                Retry
+            </button>
+        </div>
+
+        <!-- Accounts Grid -->
+        <div id="accounts-container" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <!-- Account cards will be injected here -->
+        </div>
+
+        <!-- No Accounts State -->
+        <div id="no-accounts-state" class="hidden bg-white rounded-2xl p-8 text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+            </svg>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No Trading Accounts Found</h3>
+            <p class="text-gray-600 mb-6">Please create a trading account first on Deriv.com</p>
+            <a href="https://deriv.com" target="_blank" class="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                Go to Deriv.com
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let accounts = [];
+let selectedAccountId = null;
+
+// Load accounts on page load
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadAccounts();
+});
+
+/**
+ * Load available trading accounts
+ */
+async function loadAccounts() {
+    try {
+        const response = await fetch('/accounts', {
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to load accounts: ${response.status}`);
+        }
+
+        const data = await response.json();
+        accounts = data.accounts || [];
+
+        console.log('Loaded accounts:', accounts.length);
+
+        if (accounts.length === 0) {
+            showNoAccountsState();
+        } else {
+            renderAccounts();
+        }
+    } catch (error) {
+        console.error('Error loading accounts:', error);
+        showErrorState(error.message);
+    }
+}
+
+/**
+ * Render account cards
+ */
+function renderAccounts() {
+    const container = document.getElementById('accounts-container');
+    const loadingState = document.getElementById('loading-state');
+
+    // Hide loading, show container
+    loadingState.classList.add('hidden');
+    container.classList.remove('hidden');
+
+    // Clear container
+    container.innerHTML = '';
+
+    accounts.forEach(account => {
+        const card = createAccountCard(account);
+        container.appendChild(card);
+    });
+}
+
+/**
+ * Create account card element
+ */
+function createAccountCard(account) {
+    const div = document.createElement('div');
+    div.className = 'account-card bg-white rounded-2xl p-6 cursor-pointer shadow-lg';
+    div.dataset.accountId = account.account_id;
+
+    const isActive = account.status === 'active';
+    const accountType = account.account_type === 'demo' ? 'Demo' : 'Real';
+    const balance = parseFloat(account.balance || 0).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    if (!isActive) {
+        div.classList.add('disabled', 'opacity-50', 'cursor-not-allowed');
+    }
+
+    const typeColor = account.account_type === 'demo' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700';
+    const statusBadge = isActive 
+        ? '<span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">Active</span>'
+        : '<span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">Inactive</span>';
+
+    div.innerHTML = `
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <span class="px-3 py-1 ${typeColor} text-sm font-semibold rounded-full">${accountType}</span>
+            </div>
+            ${statusBadge}
+        </div>
+        
+        <div class="mb-4">
+            <div class="text-sm text-gray-600 mb-1">Account ID</div>
+            <div class="text-lg font-semibold text-gray-900">${account.account_id}</div>
+        </div>
+        
+        <div class="mb-6">
+            <div class="text-sm text-gray-600 mb-1">Balance</div>
+            <div class="text-2xl font-bold text-gray-900">
+                ${balance} <span class="text-base text-gray-600">${account.currency || 'USD'}</span>
+            </div>
+        </div>
+        
+        <button class="w-full py-3 rounded-lg font-semibold transition select-account-btn
+                       ${isActive ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}"
+                ${!isActive ? 'disabled' : ''}>
+            ${isActive ? 'Select Account' : 'Account Inactive'}
+        </button>
+    `;
+
+    if (isActive) {
+        div.addEventListener('click', () => selectAccount(account.account_id));
+    }
+
+    return div;
+}
+
+/**
+ * Select an account
+ */
+async function selectAccount(accountId) {
+    if (selectedAccountId) return; // Prevent double-click
+
+    selectedAccountId = accountId;
+
+    try {
+        // Visual feedback
+        const card = document.querySelector(`[data-account-id="${accountId}"]`);
+        if (card) {
+            card.classList.add('selected');
+            const btn = card.querySelector('.select-account-btn');
+            if (btn) {
+                btn.textContent = 'Selecting...';
+                btn.disabled = true;
+            }
+        }
+
+        // Call API to select account
+        const response = await fetch('/accounts/select', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ account_id: accountId })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to select account');
+        }
+
+        console.log('Account selected successfully:', accountId);
+
+        // Redirect to dashboard
+        window.location.href = '/dashboard';
+
+    } catch (error) {
+        console.error('Error selecting account:', error);
+        alert('Failed to select account. Please try again.');
+        selectedAccountId = null;
+
+        // Reset visual state
+        const card = document.querySelector(`[data-account-id="${accountId}"]`);
+        if (card) {
+            card.classList.remove('selected');
+            const btn = card.querySelector('.select-account-btn');
+            if (btn) {
+                btn.textContent = 'Select Account';
+                btn.disabled = false;
+            }
+        }
+    }
+}
+
+/**
+ * Show error state
+ */
+function showErrorState(message) {
+    document.getElementById('loading-state').classList.add('hidden');
+    document.getElementById('error-message').textContent = message;
+    document.getElementById('error-state').classList.remove('hidden');
+}
+
+/**
+ * Show no accounts state
+ */
+function showNoAccountsState() {
+    document.getElementById('loading-state').classList.add('hidden');
+    document.getElementById('no-accounts-state').classList.remove('hidden');
+}
+</script>
+{% endblock %}

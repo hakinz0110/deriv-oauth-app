@@ -1,365 +1,357 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTS Trade - History</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
+{% block title %}Trade History - Deriv Bot{% endblock %}
 
-        .container {
-            width: 100%;
-            max-width: 428px;
-            margin: 0 auto;
-            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-        }
-
-        .header-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #000;
-        }
-
-        .filter-icon {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-        }
-
-        .content {
-            padding: 0 20px;
-        }
-
-        .stats-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .stat-card {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 6px;
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #000;
-        }
-
-        .stat-value.positive {
-            color: #4CAF50;
-        }
-
-        .stat-value.negative {
-            color: #E74C3C;
-        }
-
-        .filter-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        .filter-tab {
-            padding: 8px 16px;
-            border-radius: 16px;
-            border: none;
-            background: rgba(255, 255, 255, 0.6);
-            font-size: 13px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s ease;
-        }
-
-        .filter-tab.active {
-            background: rgba(255, 255, 255, 0.95);
-            color: #000;
-        }
-
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .trade-item {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .trade-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .trade-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .trade-arrow {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .trade-arrow.up {
-            background: #E8F5E9;
-            color: #4CAF50;
-        }
-
-        .trade-arrow.down {
-            background: #FFEBEE;
-            color: #E74C3C;
-        }
-
-        .trade-symbol {
-            font-size: 15px;
-            font-weight: 600;
-            color: #000;
-        }
-
-        .trade-pnl {
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .trade-pnl.positive {
-            color: #4CAF50;
-        }
-
-        .trade-pnl.negative {
-            color: #E74C3C;
-        }
-
-        .trade-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .trade-info {
-            display: flex;
-            gap: 6px;
-        }
-
-        .trade-time {
-            color: #999;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-            font-size: 14px;
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 428px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 20px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            color: #999;
-            text-decoration: none;
-        }
-
-        .nav-item.active {
-            color: #D4AF37;
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            stroke: #999;
-            transition: stroke 0.2s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            stroke: #D4AF37;
-        }
-
-        @media (max-width: 428px) {
-            .container {
-                max-width: 100%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1 class="header-title">History</h1>
-            <svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="4" y1="6" x2="20" y2="6"></line>
-                <line x1="4" y1="12" x2="20" y2="12"></line>
-                <line x1="4" y1="18" x2="16" y2="18"></line>
-            </svg>
-        </div>
-
-        <!-- Content -->
-        <div class="content">
-            <!-- Stats Row -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="stat-label">Trades</div>
-                    <div class="stat-value" id="total-trades">N/A</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Win rate</div>
-                    <div class="stat-value" id="win-rate">N/A</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Net P/L</div>
-                    <div class="stat-value positive" id="net-pnl">N/A</div>
-                </div>
+{% block content %}
+<div class="min-h-screen pb-20 lg:pb-8">
+    <!-- Custom gradient background -->
+    <div class="history-bg fixed inset-0 -z-10"></div>
+    
+    <!-- Header -->
+    <div class="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-2xl font-bold text-gray-900">History</h1>
+                <button type="button" id="filter-btn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h12"/>
+                    </svg>
+                </button>
             </div>
-
-            <!-- Filter Tabs -->
-            <div class="filter-tabs">
-                <button class="filter-tab active">All</button>
-                <button class="filter-tab">Won</button>
-                <button class="filter-tab">Lost</button>
-                <button class="filter-tab">Today</button>
-                <button class="filter-tab">Strategy</button>
-            </div>
-
-            <!-- History List -->
-            <div class="history-list" id="history-list">
-                <div class="empty-state">No trade history available</div>
-            </div>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <a href="/dashboard" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-            </a>
-            <a href="/chart" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                </svg>
-            </a>
-            <a href="/trade" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="16"></line>
-                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-            </a>
-            <a href="/history" class="nav-item active">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-            </a>
-            <a href="/settings" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v6m0 6v6m5.6-14.6l-4.2 4.2m-2.8 2.8l-4.2 4.2M23 12h-6m-6 0H1m20.6 5.6l-4.2-4.2m-2.8-2.8l-4.2-4.2"></path>
-                </svg>
-            </a>
         </div>
     </div>
 
-    <script>
-        // Filter tab switching
-        const filterTabs = document.querySelectorAll('.filter-tab');
-        filterTabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                filterTabs.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                loadHistory(this.textContent.toLowerCase());
-            });
-        });
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Stats Row -->
+        <div class="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+            <div class="bg-white/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-gray-100">
+                <p class="text-xs text-gray-500 mb-1">Trades</p>
+                <p class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900" id="total-trades">0</p>
+            </div>
+            <div class="bg-white/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-gray-100">
+                <p class="text-xs text-gray-500 mb-1">Win rate</p>
+                <p class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900" id="win-rate">0%</p>
+            </div>
+            <div class="bg-white/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg border border-gray-100">
+                <p class="text-xs text-gray-500 mb-1">Net P/L</p>
+                <p class="text-lg sm:text-xl lg:text-2xl font-bold text-green-600" id="net-pnl">$0.00</p>
+            </div>
+        </div>
 
-        // Load history data
-        async function loadHistory(filter = 'all') {
-            try {
-                // TODO: Fetch trade history from backend API
-                // const response = await fetch(`/api/history?filter=${filter}`);
-                // For now, showing empty state with N/A
-                
-                // Update stats
-                document.getElementById('total-trades').textContent = 'N/A';
-                document.getElementById('win-rate').textContent = 'N/A';
-                document.getElementById('net-pnl').textContent = 'N/A';
-                
-            } catch (error) {
-                console.error('Failed to load history:', error);
-            }
+        <!-- Filter Tabs -->
+        <div class="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
+            <button class="filter-tab active" data-filter="all">All</button>
+            <button class="filter-tab" data-filter="win">Won</button>
+            <button class="filter-tab" data-filter="loss">Lost</button>
+            <button class="filter-tab" data-filter="today">Today</button>
+            <button class="filter-tab" data-filter="open">Open</button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="hidden text-center py-12">
+            <div class="inline-block w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <p class="mt-4 text-gray-600">Loading trades...</p>
+        </div>
+
+        <!-- Trade History List -->
+        <div id="history-list" class="space-y-3">
+            <!-- Trade items will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-16">
+            <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <p class="text-gray-500 text-lg font-medium mb-2">No trades yet</p>
+            <p class="text-gray-400 text-sm">Your trade history will appear here</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden text-center py-16">
+            <svg class="w-20 h-20 mx-auto text-red-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-gray-500 text-lg font-medium mb-2">Failed to load trades</p>
+            <p class="text-gray-400 text-sm mb-4">Please try again</p>
+            <button onclick="loadTrades()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Retry
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div class="flex justify-around items-center h-16">
+            <a href="/dashboard" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="/chart" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span class="text-xs mt-1">Chart</span>
+            </a>
+            <a href="/trade" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <span class="text-xs mt-1">Trade</span>
+            </a>
+            <a href="/history" class="flex flex-col items-center justify-center flex-1 text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-xs mt-1 font-semibold">History</span>
+            </a>
+            <a href="/settings" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-xs mt-1">Settings</span>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<style>
+.history-bg {
+    background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+    opacity: 0.3;
+}
+
+.filter-tab {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.filter-tab.active {
+    background: rgba(255, 255, 255, 0.95);
+    color: #1f2937;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-tab:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.trade-item {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.trade-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+    .trade-item {
+        padding: 1.25rem;
+        border-radius: 1.25rem;
+    }
+}
+</style>
+
+<script>
+let allTrades = [];
+let currentFilter = 'all';
+
+// Load trades from API
+async function loadTrades() {
+    const listElement = document.getElementById('history-list');
+    const loadingElement = document.getElementById('loading-state');
+    const emptyElement = document.getElementById('empty-state');
+    const errorElement = document.getElementById('error-state');
+    
+    // Show loading
+    listElement.classList.add('hidden');
+    emptyElement.classList.add('hidden');
+    errorElement.classList.add('hidden');
+    loadingElement.classList.remove('hidden');
+    
+    try {
+        const response = await fetch('/api/trades?limit=100');
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch trades');
         }
+        
+        const data = await response.json();
+        
+        allTrades = data.trades || [];
+        
+        // Update statistics
+        updateStatistics(data.statistics);
+        
+        // Hide loading
+        loadingElement.classList.add('hidden');
+        
+        // Show appropriate state
+        if (allTrades.length === 0) {
+            emptyElement.classList.remove('hidden');
+        } else {
+            listElement.classList.remove('hidden');
+            renderTrades(currentFilter);
+        }
+        
+    } catch (error) {
+        console.error('Failed to load trades:', error);
+        loadingElement.classList.add('hidden');
+        errorElement.classList.remove('hidden');
+    }
+}
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadHistory();
-        });
-    </script>
-</body>
-</html>
+// Update statistics display
+function updateStatistics(stats) {
+    document.getElementById('total-trades').textContent = stats.total_trades || 0;
+    document.getElementById('win-rate').textContent = (stats.win_rate || 0) + '%';
+    
+    const netPnl = stats.net_pnl || 0;
+    const pnlElement = document.getElementById('net-pnl');
+    pnlElement.textContent = '$' + netPnl.toFixed(2);
+    
+    // Update color based on P/L
+    if (netPnl > 0) {
+        pnlElement.className = 'text-lg sm:text-xl lg:text-2xl font-bold text-green-600';
+    } else if (netPnl < 0) {
+        pnlElement.className = 'text-lg sm:text-xl lg:text-2xl font-bold text-red-600';
+    } else {
+        pnlElement.className = 'text-lg sm:text-xl lg:text-2xl font-bold text-gray-900';
+    }
+}
 
+// Filter trades based on criteria
+function filterTrades(trades, filter) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    switch(filter) {
+        case 'win':
+            return trades.filter(t => t.outcome === 'win');
+        case 'loss':
+            return trades.filter(t => t.outcome === 'loss');
+        case 'open':
+            return trades.filter(t => t.outcome === 'open');
+        case 'today':
+            return trades.filter(t => {
+                const tradeDate = new Date(t.opened_at);
+                tradeDate.setHours(0, 0, 0, 0);
+                return tradeDate.getTime() === today.getTime();
+            });
+        case 'all':
+        default:
+            return trades;
+    }
+}
+
+// Render trades to DOM
+function renderTrades(filter) {
+    const listElement = document.getElementById('history-list');
+    const filteredTrades = filterTrades(allTrades, filter);
+    
+    if (filteredTrades.length === 0) {
+        listElement.innerHTML = '<div class="text-center py-12"><p class="text-gray-500">No trades match this filter</p></div>';
+        return;
+    }
+    
+    listElement.innerHTML = filteredTrades.map(trade => createTradeCard(trade)).join('');
+}
+
+// Create trade card HTML
+function createTradeCard(trade) {
+    const isWin = trade.outcome === 'win';
+    const isLoss = trade.outcome === 'loss';
+    const isOpen = trade.outcome === 'open';
+    
+    const direction = trade.direction || 'CALL';
+    const directionColor = direction === 'CALL' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
+    const directionIcon = direction === 'CALL' ? '↑' : '↓';
+    
+    const pnl = trade.pnl || 0;
+    const pnlColor = pnl > 0 ? 'text-green-600' : pnl < 0 ? 'text-red-600' : 'text-gray-600';
+    const pnlSign = pnl > 0 ? '+' : '';
+    
+    const openedAt = new Date(trade.opened_at);
+    const timeString = openedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const dateString = openedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    
+    const outcomeClass = isWin ? 'text-green-600' : isLoss ? 'text-red-600' : 'text-blue-600';
+    const outcomeText = isOpen ? 'Open' : trade.outcome.charAt(0).toUpperCase() + trade.outcome.slice(1);
+    
+    return `
+        <div class="trade-item">
+            <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${directionColor} font-bold text-lg">
+                        ${directionIcon}
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900 text-sm sm:text-base">${trade.symbol || 'N/A'}</p>
+                        <p class="text-xs sm:text-sm text-gray-500">${trade.contract_type || 'N/A'}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold ${pnlColor} text-sm sm:text-base">${pnlSign}$${Math.abs(pnl).toFixed(2)}</p>
+                    <p class="text-xs ${outcomeClass} font-semibold">${outcomeText}</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-between text-xs sm:text-sm text-gray-600 pt-2 border-t border-gray-100">
+                <div class="flex items-center gap-4">
+                    <span>Stake: $${parseFloat(trade.stake || 0).toFixed(2)}</span>
+                    ${trade.entry_price ? `<span>Entry: ${parseFloat(trade.entry_price).toFixed(2)}</span>` : ''}
+                </div>
+                <span class="text-gray-400">${dateString} ${timeString}</span>
+            </div>
+        </div>
+    `;
+}
+
+// Filter tab click handlers
+document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        // Update active state
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update filter and render
+        currentFilter = this.dataset.filter;
+        renderTrades(currentFilter);
+    });
+});
+
+// Initialize on page load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadTrades);
+} else {
+    loadTrades();
+}
+</script>
+{% endblock %}

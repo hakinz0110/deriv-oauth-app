@@ -80,7 +80,16 @@ class AccountSelector {
      * Attach click listeners to account selector triggers
      */
     attachEventListeners() {
-        // Dashboard account type badge
+        // Dashboard header account selector trigger
+        const headerTrigger = document.getElementById('account-selector-trigger');
+        if (headerTrigger) {
+            headerTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleDropdown();
+            });
+        }
+
+        // Legacy: Dashboard account type badge (fallback)
         const accountTypeBadge = document.querySelector('.demo-badge');
         if (accountTypeBadge) {
             accountTypeBadge.style.cursor = 'pointer';
@@ -217,14 +226,15 @@ class AccountSelector {
      * Position dropdown relative to trigger element
      */
     positionDropdown(dropdown) {
-        const trigger = document.querySelector('.demo-badge') || 
+        const trigger = document.getElementById('account-selector-trigger') ||
+                       document.querySelector('.demo-badge') || 
                        document.getElementById('settings-account-selector');
         
         if (trigger) {
             const rect = trigger.getBoundingClientRect();
             dropdown.style.position = 'fixed';
             dropdown.style.top = `${rect.bottom + 8}px`;
-            dropdown.style.left = `${rect.left}px`;
+            dropdown.style.left = `${Math.max(8, rect.left)}px`; // Prevent off-screen on mobile
             dropdown.style.minWidth = '280px';
         }
     }

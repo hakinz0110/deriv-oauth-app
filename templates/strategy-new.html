@@ -1,389 +1,1059 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTS Trade - New Strategy</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
+{% block title %}New Trading System - Deriv Bot{% endblock %}
 
-        .container {
-            width: 100%;
-            max-width: 428px;
-            margin: 0 auto;
-            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            padding: 16px 20px;
-            gap: 16px;
-        }
-
-        .back-btn {
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: none;
-        }
-
-        .header-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #000;
-        }
-
-        .content {
-            padding: 0 20px;
-        }
-
-        .form-card {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .form-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: 2px solid #E0E0E0;
-            font-size: 15px;
-            color: #000;
-            background: white;
-            transition: border-color 0.2s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #D4AF37;
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: 2px solid #E0E0E0;
-            font-size: 15px;
-            color: #000;
-            background: white;
-            cursor: pointer;
-            transition: border-color 0.2s ease;
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: #D4AF37;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #000;
-            margin: 24px 0 16px;
-        }
-
-        .toggle-group {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .toggle-label {
-            font-size: 14px;
-            color: #000;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 51px;
-            height: 31px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #D0D0D0;
-            border-radius: 31px;
-            transition: 0.3s;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 27px;
-            width: 27px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            border-radius: 50%;
-            transition: 0.3s;
-        }
-
-        input:checked + .slider {
-            background-color: #4CAF50;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-
-        .save-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
-            border: none;
-            border-radius: 28px;
-            color: #000;
-            font-size: 17px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-        }
-
-        .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.45);
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 428px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 20px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            color: #999;
-            text-decoration: none;
-        }
-
-        .nav-item.active {
-            color: #D4AF37;
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            stroke: #999;
-            transition: stroke 0.2s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            stroke: #D4AF37;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <button class="back-btn" onclick="history.back()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-            </button>
-            <h1 class="header-title">New Strategy</h1>
-        </div>
-
-        <!-- Content -->
-        <div class="content">
-            <!-- Basic Information -->
-            <div class="form-card">
-                <div class="form-group">
-                    <label class="form-label">Strategy Name</label>
-                    <input type="text" class="form-input" id="strategy-name" placeholder="Enter strategy name">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Contract Type</label>
-                    <select class="form-select" id="contract-type">
-                        <option value="rise-fall">Rise / Fall</option>
-                        <option value="digits">Digits</option>
-                        <option value="touch">Touch</option>
-                        <option value="multipliers">Multipliers</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Asset</label>
-                    <select class="form-select" id="asset">
-                        <option value="volatility-75">Volatility 75 Index</option>
-                        <option value="volatility-100">Volatility 100 Index</option>
-                        <option value="boom-500">Boom 500 Index</option>
-                        <option value="crash-500">Crash 500 Index</option>
-                    </select>
-                </div>
+{% block content %}
+<div class="min-h-screen pb-20 lg:pb-8">
+    <!-- Custom gradient background -->
+    <div class="strategy-new-bg fixed inset-0 -z-10"></div>
+    
+    <!-- Header -->
+    <div class="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center h-16 gap-4">
+                <button onclick="history.back()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <h1 class="text-2xl font-bold text-gray-900">New Trading System</h1>
             </div>
-
-            <!-- Trading Parameters -->
-            <div class="section-title">Trading Parameters</div>
-            <div class="form-card">
-                <div class="form-group">
-                    <label class="form-label">Stake Amount ($)</label>
-                    <input type="number" class="form-input" id="stake" value="10.00" step="0.01" min="0">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Duration</label>
-                    <input type="text" class="form-input" id="duration" placeholder="e.g., 5 ticks">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Risk per Trade (% of balance)</label>
-                    <input type="number" class="form-input" id="risk-percent" value="2.0" step="0.1" min="0" max="100">
-                </div>
-            </div>
-
-            <!-- Risk Management -->
-            <div class="section-title">Risk Management</div>
-            <div class="form-card">
-                <div class="form-group toggle-group">
-                    <span class="toggle-label">Enable Martingale</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="martingale">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Stop-loss ($)</label>
-                    <input type="number" class="form-input" id="stop-loss" value="50.00" step="0.01" min="0">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Daily Loss Limit ($)</label>
-                    <input type="number" class="form-input" id="daily-limit" value="100.00" step="0.01" min="0">
-                </div>
-            </div>
-
-            <!-- Save Button -->
-            <button class="save-btn" onclick="saveStrategy()">Create Strategy</button>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <a href="/dashboard" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-            </a>
-            <a href="/chart" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                </svg>
-            </a>
-            <a href="/trade" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="16"></line>
-                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-            </a>
-            <a href="/history" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-            </a>
-            <a href="/settings" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v6m0 6v6m5.6-14.6l-4.2 4.2m-2.8 2.8l-4.2 4.2M23 12h-6m-6 0H1m20.6 5.6l-4.2-4.2m-2.8-2.8l-4.2-4.2"></path>
-                </svg>
-            </a>
         </div>
     </div>
 
-    <script>
-        function saveStrategy() {
-            const strategy = {
-                name: document.getElementById('strategy-name').value,
-                contract_type: document.getElementById('contract-type').value,
-                asset: document.getElementById('asset').value,
-                stake: parseFloat(document.getElementById('stake').value),
-                duration: document.getElementById('duration').value,
-                risk_percent: parseFloat(document.getElementById('risk-percent').value),
-                martingale: document.getElementById('martingale').checked,
-                stop_loss: parseFloat(document.getElementById('stop-loss').value),
-                daily_limit: parseFloat(document.getElementById('daily-limit').value)
-            };
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Info Notice -->
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div>
+                    <p class="text-sm font-semibold text-blue-900 mb-1">Trading System Builder</p>
+                    <p class="text-xs text-blue-800">Build complete trading systems: Trade Parameters → Entry Strategy → Position Sizing → Exit Strategy</p>
+                </div>
+            </div>
+        </div>
 
-            if (!strategy.name) {
-                alert('Please enter a strategy name');
-                return;
-            }
+        <form id="system-form">
+            <!-- Section 1: Basic Information -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Basic Information
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="system-name" class="block text-sm font-bold text-gray-700 mb-2">
+                            System Name *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="system-name" 
+                            required
+                            placeholder="e.g., RSI Martingale System" 
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                    </div>
+                    <div>
+                        <label for="system-description" class="block text-sm font-bold text-gray-700 mb-2">
+                            Description (optional)
+                        </label>
+                        <textarea 
+                            id="system-description" 
+                            rows="2"
+                            placeholder="Describe your trading system strategy..."
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        ></textarea>
+                    </div>
+                </div>
+            </div>
 
-            // TODO: Send to backend API
-            console.log('Creating strategy:', strategy);
-            alert('Strategy created successfully!');
-            window.location.href = '/strategy';
+            <!-- Section 2: Trade Parameters -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Trade Parameters
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="contract-type" class="block text-sm font-bold text-gray-700 mb-2">
+                            Contract Type *
+                        </label>
+                        <select 
+                            id="contract-type" 
+                            required
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                            <option value="">Select contract type</option>
+                            <optgroup label="Rise/Fall">
+                                <option value="CALL">Rise (CALL)</option>
+                                <option value="PUT">Fall (PUT)</option>
+                            </optgroup>
+                            <optgroup label="Higher/Lower">
+                                <option value="CALLE">Higher (CALLE)</option>
+                                <option value="PUTE">Lower (PUTE)</option>
+                            </optgroup>
+                            <optgroup label="Digits">
+                                <option value="DIGITMATCH">Matches</option>
+                                <option value="DIGITDIFF">Differs</option>
+                                <option value="DIGITEVEN">Even</option>
+                                <option value="DIGITODD">Odd</option>
+                                <option value="DIGITOVER">Over</option>
+                                <option value="DIGITUNDER">Under</option>
+                            </optgroup>
+                            <optgroup label="Touch">
+                                <option value="ONETOUCH">Touch</option>
+                                <option value="NOTOUCH">No Touch</option>
+                            </optgroup>
+                            <optgroup label="Ends/Stays">
+                                <option value="EXPIRYMISS">Ends Outside</option>
+                                <option value="EXPIRYRANGE">Ends Between</option>
+                                <option value="RANGE">Stays Between</option>
+                                <option value="UPORDOWN">Goes Outside</option>
+                            </optgroup>
+                            <optgroup label="Multipliers">
+                                <option value="MULTUP">Up</option>
+                                <option value="MULTDOWN">Down</option>
+                            </optgroup>
+                            <optgroup label="Other">
+                                <option value="ACCU">Accumulators</option>
+                                <option value="ASIANU">Asian Up</option>
+                                <option value="ASIAND">Asian Down</option>
+                                <option value="RESETCALL">Reset Call</option>
+                                <option value="RESETPUT">Reset Put</option>
+                                <option value="TICKHIGH">Tick High</option>
+                                <option value="TICKLOW">Tick Low</option>
+                                <option value="RUNHIGH">Only Ups</option>
+                                <option value="RUNLOW">Only Downs</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="symbol" class="block text-sm font-bold text-gray-700 mb-2">
+                            Symbol *
+                        </label>
+                        <select 
+                            id="symbol" 
+                            required
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                            <option value="">Select symbol</option>
+                            <optgroup label="Volatility Indices">
+                                <option value="R_10">Volatility 10 Index</option>
+                                <option value="R_25">Volatility 25 Index</option>
+                                <option value="R_50">Volatility 50 Index</option>
+                                <option value="R_75">Volatility 75 Index</option>
+                                <option value="R_100">Volatility 100 Index</option>
+                                <option value="1HZ10V">Volatility 10 (1s) Index</option>
+                                <option value="1HZ25V">Volatility 25 (1s) Index</option>
+                                <option value="1HZ50V">Volatility 50 (1s) Index</option>
+                                <option value="1HZ75V">Volatility 75 (1s) Index</option>
+                                <option value="1HZ100V">Volatility 100 (1s) Index</option>
+                            </optgroup>
+                            <optgroup label="Crash/Boom Indices">
+                                <option value="BOOM300N">Boom 300 Index</option>
+                                <option value="BOOM500">Boom 500 Index</option>
+                                <option value="BOOM600">Boom 600 Index</option>
+                                <option value="BOOM900">Boom 900 Index</option>
+                                <option value="BOOM1000">Boom 1000 Index</option>
+                                <option value="CRASH300N">Crash 300 Index</option>
+                                <option value="CRASH500">Crash 500 Index</option>
+                                <option value="CRASH600">Crash 600 Index</option>
+                                <option value="CRASH900">Crash 900 Index</option>
+                                <option value="CRASH1000">Crash 1000 Index</option>
+                            </optgroup>
+                            <optgroup label="Range Break Indices">
+                                <option value="RDBULL">Range Break 100 Index</option>
+                                <option value="RDBEAR">Range Break 200 Index</option>
+                            </optgroup>
+                            <optgroup label="Step Indices">
+                                <option value="STPIDX">Step Index</option>
+                            </optgroup>
+                            <optgroup label="Jump Indices">
+                                <option value="JD10">Jump 10 Index</option>
+                                <option value="JD25">Jump 25 Index</option>
+                                <option value="JD50">Jump 50 Index</option>
+                                <option value="JD75">Jump 75 Index</option>
+                                <option value="JD100">Jump 100 Index</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="duration" class="block text-sm font-bold text-gray-700 mb-2">
+                                Duration *
+                            </label>
+                            <input 
+                                type="number" 
+                                id="duration" 
+                                required
+                                min="1"
+                                placeholder="5"
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            >
+                        </div>
+                        <div>
+                            <label for="duration-unit" class="block text-sm font-bold text-gray-700 mb-2">
+                                Unit *
+                            </label>
+                            <select 
+                                id="duration-unit" 
+                                required
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            >
+                                <option value="t">Ticks</option>
+                                <option value="s">Seconds</option>
+                                <option value="m">Minutes</option>
+                                <option value="h">Hours</option>
+                                <option value="d">Days</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Entry Strategy -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                    Entry Strategy
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="entry-type" class="block text-sm font-bold text-gray-700 mb-2">
+                            Entry Strategy Type *
+                        </label>
+                        <select 
+                            id="entry-type" 
+                            required
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                            <option value="">Select entry strategy</option>
+                            <option value="manual">Manual Entry - Trade manually</option>
+                            <option value="rsi">RSI - Relative Strength Index</option>
+                            <option value="macd">MACD - Moving Average Convergence Divergence</option>
+                            <option value="ema_cross">EMA Crossover - Fast/Slow EMA Cross</option>
+                            <option value="bb">Bollinger Bands - Price touches bands</option>
+                            <option value="sma">SMA - Simple Moving Average</option>
+                            <option value="tick_analysis">Tick Analysis - Pattern recognition</option>
+                            <option value="price_based">Price-Based - Specific price levels</option>
+                        </select>
+                    </div>
+
+                    <!-- Indicators List -->
+                    <div id="indicators-container" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="text-sm font-bold text-gray-700">Indicators</p>
+                            <button type="button" id="add-indicator-btn" class="flex items-center gap-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Add Indicator
+                            </button>
+                        </div>
+                        <div id="indicators-list" class="space-y-2 mb-3">
+                            <!-- Indicators will be added here -->
+                        </div>
+                        <div>
+                            <label for="entry-logic" class="block text-sm font-bold text-gray-700 mb-2">
+                                Logic (for multiple indicators)
+                            </label>
+                            <select 
+                                id="entry-logic"
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            >
+                                <option value="AND">AND - All indicators must be true</option>
+                                <option value="OR">OR - Any indicator can be true</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Single Indicator Config Button -->
+                    <div id="single-indicator-btn-container" class="hidden">
+                        <button type="button" id="configure-entry-btn" class="w-full px-4 py-3 bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            </svg>
+                            Configure Entry Strategy
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Position Sizing -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Position Sizing
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="position-type" class="block text-sm font-bold text-gray-700 mb-2">
+                            Position Sizing Type *
+                        </label>
+                        <select 
+                            id="position-type" 
+                            required
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                            <option value="">Select position sizing</option>
+                            <option value="fixed">Fixed Stake - Same amount every trade</option>
+                            <option value="martingale">Martingale - Multiply after losses</option>
+                            <option value="anti_martingale">Anti-Martingale - Multiply after wins</option>
+                            <option value="compound">Compound - Percentage of balance</option>
+                            <option value="fibonacci">Fibonacci - Follow Fibonacci sequence</option>
+                            <option value="dalembert">D'Alembert - Increment by fixed amount</option>
+                        </select>
+                    </div>
+
+                    <button type="button" id="configure-position-btn" class="w-full px-4 py-3 bg-orange-50 hover:bg-orange-100 text-orange-700 font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 hidden">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        </svg>
+                        Configure Position Sizing
+                    </button>
+
+                    <div id="position-config-summary" class="hidden p-4 bg-gray-50 rounded-xl">
+                        <p class="text-sm font-bold text-gray-700 mb-2">Configuration</p>
+                        <div id="position-summary-content" class="text-sm text-gray-600"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button 
+                type="submit" 
+                class="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02] shadow-lg"
+            >
+                Create Trading System
+            </button>
+        </form>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div class="flex justify-around items-center h-16">
+            <a href="/dashboard" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="/chart" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span class="text-xs mt-1">Chart</span>
+            </a>
+            <a href="/trade" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <span class="text-xs mt-1">Trade</span>
+            </a>
+            <a href="/history" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-xs mt-1">History</span>
+            </a>
+            <a href="/settings" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-xs mt-1">Settings</span>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<!-- Configuration Modals will be dynamically injected here -->
+<div id="modal-container"></div>
+
+<style>
+.strategy-new-bg {
+    background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+    opacity: 0.3;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 1rem;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.indicator-item {
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+}
+
+.indicator-item:hover {
+    border-color: #9ca3af;
+}
+</style>
+
+<script src="/static/cache-loader.js"></script>
+<script>
+// Trading system data
+let entryStrategyType = '';
+let entryConditions = [];
+let positionSizingType = '';
+let positionSizingConfig = {};
+let currentEditingIndicatorIndex = null;
+
+// Entry type change handler
+document.getElementById('entry-type').addEventListener('change', function() {
+    entryStrategyType = this.value;
+    
+    if (!entryStrategyType) {
+        document.getElementById('indicators-container').classList.add('hidden');
+        document.getElementById('single-indicator-btn-container').classList.add('hidden');
+        return;
+    }
+    
+    if (entryStrategyType === 'manual') {
+        // Manual entry - no configuration needed
+        document.getElementById('indicators-container').classList.add('hidden');
+        document.getElementById('single-indicator-btn-container').classList.add('hidden');
+        entryConditions = [];
+    } else {
+        // Show "+ Add Indicator" for confluence
+        document.getElementById('indicators-container').classList.remove('hidden');
+        document.getElementById('single-indicator-btn-container').classList.add('hidden');
+        
+        // Clear existing indicators
+        entryConditions = [];
+        renderIndicatorsList();
+    }
+});
+
+// Position type change handler
+document.getElementById('position-type').addEventListener('change', function() {
+    positionSizingType = this.value;
+    
+    if (!positionSizingType) {
+        document.getElementById('configure-position-btn').classList.add('hidden');
+        document.getElementById('position-config-summary').classList.add('hidden');
+        return;
+    }
+    
+    document.getElementById('configure-position-btn').classList.remove('hidden');
+    positionSizingConfig = {};
+    document.getElementById('position-config-summary').classList.add('hidden');
+});
+
+// Add Indicator button
+document.getElementById('add-indicator-btn').addEventListener('click', function() {
+    currentEditingIndicatorIndex = null;
+    showIndicatorConfigModal(entryStrategyType);
+});
+
+// Configure Position button
+document.getElementById('configure-position-btn').addEventListener('click', function() {
+    showPositionConfigModal(positionSizingType);
+});
+
+// Render indicators list (Option A: detailed list)
+function renderIndicatorsList() {
+    const container = document.getElementById('indicators-list');
+    
+    if (entryConditions.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500 italic py-4 text-center">No indicators added yet. Click "+ Add Indicator" to begin.</p>';
+        return;
+    }
+    
+    container.innerHTML = entryConditions.map((indicator, index) => `
+        <div class="indicator-item">
+            <div class="flex-1">
+                <p class="font-semibold text-gray-900 text-sm">${formatIndicatorType(indicator.type)}</p>
+                <p class="text-xs text-gray-600 mt-1">${formatIndicatorConfig(indicator)}</p>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" onclick="editIndicator(${index})" class="px-3 py-1.5 text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-lg transition-colors">
+                    Configure
+                </button>
+                <button type="button" onclick="removeIndicator(${index})" class="px-3 py-1.5 text-sm bg-red-50 hover:bg-red-100 text-red-700 font-semibold rounded-lg transition-colors">
+                    Remove
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Format indicator type
+function formatIndicatorType(type) {
+    const types = {
+        'rsi': 'RSI',
+        'macd': 'MACD',
+        'ema_cross': 'EMA Crossover',
+        'bb': 'Bollinger Bands',
+        'sma': 'SMA',
+        'tick_analysis': 'Tick Analysis',
+        'price_based': 'Price-Based'
+    };
+    return types[type] || type;
+}
+
+// Format indicator configuration display
+function formatIndicatorConfig(indicator) {
+    const config = indicator.config || {};
+    switch (indicator.type) {
+        case 'rsi':
+            return `Period: ${config.period || 14}, Overbought: ${config.overbought || 70}, Oversold: ${config.oversold || 30}`;
+        case 'macd':
+            return `Fast: ${config.fast_period || 12}, Slow: ${config.slow_period || 26}, Signal: ${config.signal_period || 9}`;
+        case 'ema_cross':
+            return `Fast: ${config.fast_period || 9}, Slow: ${config.slow_period || 21}`;
+        case 'bb':
+            return `Period: ${config.period || 20}, Std Dev: ${config.std_dev || 2}`;
+        case 'sma':
+            return `Period: ${config.period || 20}`;
+        case 'tick_analysis':
+            return `Pattern: ${config.pattern_type || 'default'}, Lookback: ${config.lookback_ticks || 10} ticks`;
+        case 'price_based':
+            return `Target: ${config.target_price || 0}, Condition: ${config.condition || 'above'}`;
+        default:
+            return 'Configured';
+    }
+}
+
+// Edit indicator
+window.editIndicator = function(index) {
+    currentEditingIndicatorIndex = index;
+    const indicator = entryConditions[index];
+    showIndicatorConfigModal(indicator.type, indicator.config);
+};
+
+// Remove indicator
+window.removeIndicator = function(index) {
+    if (confirm('Remove this indicator?')) {
+        entryConditions.splice(index, 1);
+        renderIndicatorsList();
+    }
+};
+
+// Show indicator configuration modal
+function showIndicatorConfigModal(type, existingConfig = {}) {
+    const modalContainer = document.getElementById('modal-container');
+    
+    let fields = '';
+    
+    switch (type) {
+        case 'rsi':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Period</label>
+                    <input type="number" id="modal-period" value="${existingConfig.period || 14}" min="1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Overbought Threshold</label>
+                    <input type="number" id="modal-overbought" value="${existingConfig.overbought || 70}" min="0" max="100" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Oversold Threshold</label>
+                    <input type="number" id="modal-oversold" value="${existingConfig.oversold || 30}" min="0" max="100" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+            `;
+            break;
+        case 'macd':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Fast Period</label>
+                    <input type="number" id="modal-fast-period" value="${existingConfig.fast_period || 12}" min="1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Slow Period</label>
+                    <input type="number" id="modal-slow-period" value="${existingConfig.slow_period || 26}" min="1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Signal Period</label>
+                    <input type="number" id="modal-signal-period" value="${existingConfig.signal_period || 9}" min="1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+            `;
+            break;
+        case 'ema_cross':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Fast EMA Period</label>
+                    <input type="number" id="modal-fast-period" value="${existingConfig.fast_period || 9}" min="1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Slow EMA Period</label>
+                    <input type="number" id="modal-slow-period" value="${existingConfig.slow_period || 21}" min="1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+            `;
+            break;
+        case 'bb':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Period</label>
+                    <input type="number" id="modal-period" value="${existingConfig.period || 20}" min="1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Standard Deviation</label>
+                    <input type="number" id="modal-std-dev" value="${existingConfig.std_dev || 2}" min="0.1" step="0.1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+            `;
+            break;
+        case 'sma':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Period</label>
+                    <input type="number" id="modal-period" value="${existingConfig.period || 20}" min="1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+            `;
+            break;
+        case 'tick_analysis':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Pattern Type</label>
+                    <select id="modal-pattern-type" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                        <option value="consecutive_up" ${existingConfig.pattern_type === 'consecutive_up' ? 'selected' : ''}>Consecutive Ups</option>
+                        <option value="consecutive_down" ${existingConfig.pattern_type === 'consecutive_down' ? 'selected' : ''}>Consecutive Downs</option>
+                        <option value="zigzag" ${existingConfig.pattern_type === 'zigzag' ? 'selected' : ''}>Zigzag Pattern</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Lookback Ticks</label>
+                    <input type="number" id="modal-lookback-ticks" value="${existingConfig.lookback_ticks || 10}" min="1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+            `;
+            break;
+        case 'price_based':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Target Price</label>
+                    <input type="number" id="modal-target-price" value="${existingConfig.target_price || 0}" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Condition</label>
+                    <select id="modal-condition" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                        <option value="above" ${existingConfig.condition === 'above' ? 'selected' : ''}>Above</option>
+                        <option value="below" ${existingConfig.condition === 'below' ? 'selected' : ''}>Below</option>
+                        <option value="equals" ${existingConfig.condition === 'equals' ? 'selected' : ''}>Equals</option>
+                    </select>
+                </div>
+            `;
+            break;
+    }
+    
+    modalContainer.innerHTML = `
+        <div class="modal-overlay" onclick="closeModal(event)">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">Configure ${formatIndicatorType(type)}</h3>
+                        <button onclick="closeModal()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4 mb-6">
+                        ${fields}
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button onclick="closeModal()" class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="saveIndicatorConfig('${type}')" class="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Save indicator configuration
+window.saveIndicatorConfig = function(type) {
+    const config = {};
+    
+    switch (type) {
+        case 'rsi':
+            config.period = parseInt(document.getElementById('modal-period').value);
+            config.overbought = parseInt(document.getElementById('modal-overbought').value);
+            config.oversold = parseInt(document.getElementById('modal-oversold').value);
+            break;
+        case 'macd':
+            config.fast_period = parseInt(document.getElementById('modal-fast-period').value);
+            config.slow_period = parseInt(document.getElementById('modal-slow-period').value);
+            config.signal_period = parseInt(document.getElementById('modal-signal-period').value);
+            break;
+        case 'ema_cross':
+            config.fast_period = parseInt(document.getElementById('modal-fast-period').value);
+            config.slow_period = parseInt(document.getElementById('modal-slow-period').value);
+            break;
+        case 'bb':
+            config.period = parseInt(document.getElementById('modal-period').value);
+            config.std_dev = parseFloat(document.getElementById('modal-std-dev').value);
+            break;
+        case 'sma':
+            config.period = parseInt(document.getElementById('modal-period').value);
+            break;
+        case 'tick_analysis':
+            config.pattern_type = document.getElementById('modal-pattern-type').value;
+            config.lookback_ticks = parseInt(document.getElementById('modal-lookback-ticks').value);
+            break;
+        case 'price_based':
+            config.target_price = parseFloat(document.getElementById('modal-target-price').value);
+            config.condition = document.getElementById('modal-condition').value;
+            break;
+    }
+    
+    const indicator = { type, config };
+    
+    if (currentEditingIndicatorIndex !== null) {
+        // Edit existing
+        entryConditions[currentEditingIndicatorIndex] = indicator;
+    } else {
+        // Add new
+        entryConditions.push(indicator);
+    }
+    
+    renderIndicatorsList();
+    closeModal();
+};
+
+// Show position sizing configuration modal
+function showPositionConfigModal(type, existingConfig = {}) {
+    const modalContainer = document.getElementById('modal-container');
+    
+    let fields = '';
+    
+    switch (type) {
+        case 'fixed':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Stake Amount ($)</label>
+                    <input type="number" id="modal-stake-amount" value="${existingConfig.stake_amount || 10}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+            `;
+            break;
+        case 'martingale':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Base Stake ($)</label>
+                    <input type="number" id="modal-base-stake" value="${existingConfig.base_stake || 10}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Loss Multiplier</label>
+                    <input type="number" id="modal-loss-multiplier" value="${existingConfig.loss_multiplier || 2}" min="1" step="0.1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Max Stake ($)</label>
+                    <input type="number" id="modal-max-stake" value="${existingConfig.max_stake || 100}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="modal-reset-on-win" ${existingConfig.reset_on_win ? 'checked' : ''} class="w-4 h-4">
+                    <label for="modal-reset-on-win" class="text-sm font-medium text-gray-700">Reset on win</label>
+                </div>
+            `;
+            break;
+        case 'anti_martingale':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Base Stake ($)</label>
+                    <input type="number" id="modal-base-stake" value="${existingConfig.base_stake || 10}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Win Multiplier</label>
+                    <input type="number" id="modal-win-multiplier" value="${existingConfig.win_multiplier || 2}" min="1" step="0.1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Max Stake ($)</label>
+                    <input type="number" id="modal-max-stake" value="${existingConfig.max_stake || 100}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="modal-reset-on-loss" ${existingConfig.reset_on_loss ? 'checked' : ''} class="w-4 h-4">
+                    <label for="modal-reset-on-loss" class="text-sm font-medium text-gray-700">Reset on loss</label>
+                </div>
+            `;
+            break;
+        case 'compound':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Percentage of Balance (%)</label>
+                    <input type="number" id="modal-percentage" value="${existingConfig.percentage || 2}" min="0.1" max="100" step="0.1" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Min Stake ($)</label>
+                    <input type="number" id="modal-min-stake" value="${existingConfig.min_stake || 1}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Max Stake ($)</label>
+                    <input type="number" id="modal-max-stake" value="${existingConfig.max_stake || 100}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+            `;
+            break;
+        case 'fibonacci':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Base Stake ($)</label>
+                    <input type="number" id="modal-base-stake" value="${existingConfig.base_stake || 10}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Max Stake ($)</label>
+                    <input type="number" id="modal-max-stake" value="${existingConfig.max_stake || 100}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="modal-reset-on-win" ${existingConfig.reset_on_win ? 'checked' : ''} class="w-4 h-4">
+                    <label for="modal-reset-on-win" class="text-sm font-medium text-gray-700">Reset on win</label>
+                </div>
+            `;
+            break;
+        case 'dalembert':
+            fields = `
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Base Stake ($)</label>
+                    <input type="number" id="modal-base-stake" value="${existingConfig.base_stake || 10}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Increment Amount ($)</label>
+                    <input type="number" id="modal-increment" value="${existingConfig.increment || 5}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Max Stake ($)</label>
+                    <input type="number" id="modal-max-stake" value="${existingConfig.max_stake || 100}" min="0.01" step="0.01" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg">
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="modal-reset-on-win" ${existingConfig.reset_on_win ? 'checked' : ''} class="w-4 h-4">
+                    <label for="modal-reset-on-win" class="text-sm font-medium text-gray-700">Reset on win</label>
+                </div>
+            `;
+            break;
+    }
+    
+    modalContainer.innerHTML = `
+        <div class="modal-overlay" onclick="closeModal(event)">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">Configure ${formatPositionType(type)}</h3>
+                        <button onclick="closeModal()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4 mb-6">
+                        ${fields}
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button onclick="closeModal()" class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="savePositionConfig('${type}')" class="flex-1 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Format position type
+function formatPositionType(type) {
+    const types = {
+        'fixed': 'Fixed Stake',
+        'martingale': 'Martingale',
+        'anti_martingale': 'Anti-Martingale',
+        'compound': 'Compound',
+        'fibonacci': 'Fibonacci',
+        'dalembert': "D'Alembert"
+    };
+    return types[type] || type;
+}
+
+// Save position sizing configuration
+window.savePositionConfig = function(type) {
+    const config = {};
+    
+    switch (type) {
+        case 'fixed':
+            config.stake_amount = parseFloat(document.getElementById('modal-stake-amount').value);
+            break;
+        case 'martingale':
+            config.base_stake = parseFloat(document.getElementById('modal-base-stake').value);
+            config.loss_multiplier = parseFloat(document.getElementById('modal-loss-multiplier').value);
+            config.max_stake = parseFloat(document.getElementById('modal-max-stake').value);
+            config.reset_on_win = document.getElementById('modal-reset-on-win').checked;
+            break;
+        case 'anti_martingale':
+            config.base_stake = parseFloat(document.getElementById('modal-base-stake').value);
+            config.win_multiplier = parseFloat(document.getElementById('modal-win-multiplier').value);
+            config.max_stake = parseFloat(document.getElementById('modal-max-stake').value);
+            config.reset_on_loss = document.getElementById('modal-reset-on-loss').checked;
+            break;
+        case 'compound':
+            config.percentage = parseFloat(document.getElementById('modal-percentage').value);
+            config.min_stake = parseFloat(document.getElementById('modal-min-stake').value);
+            config.max_stake = parseFloat(document.getElementById('modal-max-stake').value);
+            break;
+        case 'fibonacci':
+            config.base_stake = parseFloat(document.getElementById('modal-base-stake').value);
+            config.max_stake = parseFloat(document.getElementById('modal-max-stake').value);
+            config.reset_on_win = document.getElementById('modal-reset-on-win').checked;
+            break;
+        case 'dalembert':
+            config.base_stake = parseFloat(document.getElementById('modal-base-stake').value);
+            config.increment = parseFloat(document.getElementById('modal-increment').value);
+            config.max_stake = parseFloat(document.getElementById('modal-max-stake').value);
+            config.reset_on_win = document.getElementById('modal-reset-on-win').checked;
+            break;
+    }
+    
+    positionSizingConfig = config;
+    
+    // Show summary
+    document.getElementById('position-config-summary').classList.remove('hidden');
+    document.getElementById('position-summary-content').innerHTML = formatPositionConfigSummary(type, config);
+    
+    closeModal();
+};
+
+// Format position config summary
+function formatPositionConfigSummary(type, config) {
+    switch (type) {
+        case 'fixed':
+            return `<p>Stake: $${config.stake_amount.toFixed(2)}</p>`;
+        case 'martingale':
+            return `<p>Base: $${config.base_stake.toFixed(2)}, Multiplier: ${config.loss_multiplier}x, Max: $${config.max_stake.toFixed(2)}</p>`;
+        case 'anti_martingale':
+            return `<p>Base: $${config.base_stake.toFixed(2)}, Multiplier: ${config.win_multiplier}x, Max: $${config.max_stake.toFixed(2)}</p>`;
+        case 'compound':
+            return `<p>${config.percentage}% of balance, Min: $${config.min_stake.toFixed(2)}, Max: $${config.max_stake.toFixed(2)}</p>`;
+        case 'fibonacci':
+            return `<p>Base: $${config.base_stake.toFixed(2)}, Max: $${config.max_stake.toFixed(2)}</p>`;
+        case 'dalembert':
+            return `<p>Base: $${config.base_stake.toFixed(2)}, Increment: $${config.increment.toFixed(2)}, Max: $${config.max_stake.toFixed(2)}</p>`;
+        default:
+            return 'Configured';
+    }
+}
+
+// Close modal
+window.closeModal = function(event) {
+    if (!event || event.target === event.currentTarget) {
+        document.getElementById('modal-container').innerHTML = '';
+    }
+};
+
+// Form submission
+document.getElementById('system-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Validate
+    if (!entryStrategyType) {
+        alert('Please select an entry strategy type');
+        return;
+    }
+    
+    if (entryStrategyType !== 'manual' && entryConditions.length === 0) {
+        alert('Please add at least one indicator for your entry strategy');
+        return;
+    }
+    
+    if (!positionSizingType) {
+        alert('Please select a position sizing type');
+        return;
+    }
+    
+    if (Object.keys(positionSizingConfig).length === 0) {
+        alert('Please configure your position sizing strategy');
+        return;
+    }
+    
+    // Build system data
+    const systemData = {
+        name: document.getElementById('system-name').value,
+        description: document.getElementById('system-description').value,
+        contract_type: document.getElementById('contract-type').value,
+        symbol: document.getElementById('symbol').value,
+        duration: parseInt(document.getElementById('duration').value),
+        duration_unit: document.getElementById('duration-unit').value,
+        entry_strategy_type: entryStrategyType,
+        entry_conditions: entryStrategyType === 'manual' ? { rules: [], type: 'manual' } : entryConditions,
+        entry_logic: document.getElementById('entry-logic').value,
+        position_sizing_type: positionSizingType,
+        position_sizing_config: positionSizingConfig,
+        exit_strategy_type: 'contract_end',
+        exit_conditions: {}
+    };
+    
+    try {
+        const response = await fetch('/api/trading-systems', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(systemData)
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to create trading system');
         }
-    </script>
-</body>
-</html>
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('Trading system created successfully!');
+            window.location.href = '/trading-system';
+        } else {
+            throw new Error(result.message || 'Unknown error');
+        }
+        
+    } catch (error) {
+        console.error('Failed to create trading system:', error);
+        alert(`Failed to create trading system: ${error.message}`);
+    }
+});
 
+// Check for edit mode
+const urlParams = new URLSearchParams(window.location.search);
+const editId = urlParams.get('id');
+
+if (editId) {
+    // TODO: Load existing system and populate form
+    console.log('Edit mode for system:', editId);
+}
+</script>
+{% endblock %}

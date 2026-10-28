@@ -1,350 +1,262 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTS Trade - Trade Details</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
+{% block title %}Trade Details - Deriv Bot{% endblock %}
 
-        .container {
-            width: 100%;
-            max-width: 428px;
-            margin: 0 auto;
-            background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
+{% block content %}
+<div class="min-h-screen pb-20 lg:pb-8">
+    <!-- Custom gradient background -->
+    <div class="trade-detail-bg fixed inset-0 -z-10"></div>
+    
+    <!-- Header -->
+    <div class="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center h-16 gap-4">
+                <button onclick="history.back()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <h1 class="text-2xl font-bold text-gray-900">Trade Details</h1>
+            </div>
+        </div>
+    </div>
 
-        .header {
-            display: flex;
-            align-items: center;
-            padding: 16px 20px;
-            gap: 16px;
-        }
-
-        .back-btn {
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: none;
-        }
-
-        .header-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #000;
-        }
-
-        .content {
-            padding: 0 20px;
-        }
-
-        .status-card {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-
-        .pnl-amount {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .pnl-amount.profit {
-            color: #4CAF50;
-        }
-
-        .pnl-amount.loss {
-            color: #E74C3C;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 16px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .status-badge.won {
-            background: #E8F5E9;
-            color: #4CAF50;
-        }
-
-        .status-badge.lost {
-            background: #FFEBEE;
-            color: #E74C3C;
-        }
-
-        .details-card {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 20px;
-            padding: 8px 0;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-        }
-
-        .detail-label {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .detail-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: #000;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #000;
-            margin: 24px 0 12px;
-        }
-
-        .chart-card {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            height: 200px;
-        }
-
-        .chart-placeholder {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to top, rgba(76, 175, 80, 0.05) 0%, transparent 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-            font-size: 14px;
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 428px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 20px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            color: #999;
-            text-decoration: none;
-        }
-
-        .nav-item.active {
-            color: #D4AF37;
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            stroke: #999;
-            transition: stroke 0.2s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            stroke: #D4AF37;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <button class="back-btn" onclick="history.back()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-            </button>
-            <h1 class="header-title">Trade Details</h1>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- P&L Status Card -->
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 sm:p-8 mb-6 border border-gray-100 text-center">
+            <div class="mb-3">
+                <p class="text-4xl sm:text-5xl font-bold" id="pnl-amount">--</p>
+            </div>
+            <div>
+                <span class="inline-block px-4 py-2 rounded-full text-sm font-bold" id="status-badge">Loading...</span>
+            </div>
         </div>
 
-        <!-- Content -->
-        <div class="content">
-            <!-- Status Card -->
-            <div class="status-card">
-                <div class="pnl-amount profit" id="pnl-amount">N/A</div>
-                <div class="status-badge won" id="status-badge">N/A</div>
-            </div>
-
+        <!-- Trade Information Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <!-- Trade Information -->
-            <div class="section-title">Trade Information</div>
-            <div class="details-card">
-                <div class="detail-row">
-                    <span class="detail-label">Asset</span>
-                    <span class="detail-value" id="asset">N/A</span>
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3">
+                    <h3 class="text-sm font-bold text-white flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Trade Information
+                    </h3>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Contract Type</span>
-                    <span class="detail-value" id="contract-type">N/A</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Direction</span>
-                    <span class="detail-value" id="direction">N/A</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Stake</span>
-                    <span class="detail-value" id="stake">N/A</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Payout</span>
-                    <span class="detail-value" id="payout">N/A</span>
+                <div class="divide-y divide-gray-100">
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Asset</span>
+                        <span class="text-sm font-bold text-gray-900" id="asset">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Contract Type</span>
+                        <span class="text-sm font-bold text-gray-900" id="contract-type">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Direction</span>
+                        <span class="text-sm font-bold text-gray-900" id="direction">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Stake</span>
+                        <span class="text-sm font-bold text-gray-900" id="stake">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Payout</span>
+                        <span class="text-sm font-bold text-gray-900" id="payout">--</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Timing -->
-            <div class="section-title">Timing</div>
-            <div class="details-card">
-                <div class="detail-row">
-                    <span class="detail-label">Entry Time</span>
-                    <span class="detail-value" id="entry-time">N/A</span>
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-green-500 to-teal-600 px-4 py-3">
+                    <h3 class="text-sm font-bold text-white flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Timing
+                    </h3>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Exit Time</span>
-                    <span class="detail-value" id="exit-time">N/A</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Duration</span>
-                    <span class="detail-value" id="duration">N/A</span>
+                <div class="divide-y divide-gray-100">
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Entry Time</span>
+                        <span class="text-sm font-bold text-gray-900" id="entry-time">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Exit Time</span>
+                        <span class="text-sm font-bold text-gray-900" id="exit-time">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Duration</span>
+                        <span class="text-sm font-bold text-gray-900" id="duration">--</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Price Information -->
-            <div class="section-title">Price Information</div>
-            <div class="details-card">
-                <div class="detail-row">
-                    <span class="detail-label">Entry Price</span>
-                    <span class="detail-value" id="entry-price">N/A</span>
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-orange-500 to-red-600 px-4 py-3">
+                    <h3 class="text-sm font-bold text-white flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                        </svg>
+                        Price Information
+                    </h3>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Exit Price</span>
-                    <span class="detail-value" id="exit-price">N/A</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Barrier</span>
-                    <span class="detail-value" id="barrier">N/A</span>
+                <div class="divide-y divide-gray-100">
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Entry Price</span>
+                        <span class="text-sm font-bold text-gray-900" id="entry-price">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Exit Price</span>
+                        <span class="text-sm font-bold text-gray-900" id="exit-price">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Barrier</span>
+                        <span class="text-sm font-bold text-gray-900" id="barrier">--</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Chart -->
-            <div class="section-title">Price Chart</div>
-            <div class="chart-card">
-                <div class="chart-placeholder">
-                    Trade chart will be displayed here
+            <!-- Strategy Info -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-500 to-pink-600 px-4 py-3">
+                    <h3 class="text-sm font-bold text-white flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        Strategy & ID
+                    </h3>
                 </div>
-            </div>
-
-            <!-- Strategy -->
-            <div class="section-title">Strategy</div>
-            <div class="details-card">
-                <div class="detail-row">
-                    <span class="detail-label">Strategy Name</span>
-                    <span class="detail-value" id="strategy">N/A</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Trade ID</span>
-                    <span class="detail-value" id="trade-id">N/A</span>
+                <div class="divide-y divide-gray-100">
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Strategy Name</span>
+                        <span class="text-sm font-bold text-gray-900" id="strategy">--</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <span class="text-sm text-gray-600">Trade ID</span>
+                        <span class="text-sm font-mono text-gray-900 break-all" id="trade-id">--</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <a href="/dashboard" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        <!-- Price Chart (Optional - can integrate Lightweight Charts) -->
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-4 border border-gray-100 mb-6">
+            <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center">
+                <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
                 </svg>
-            </a>
-            <a href="/chart" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                </svg>
-            </a>
-            <a href="/trade" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="16"></line>
-                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-            </a>
-            <a href="/history" class="nav-item active">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-            </a>
-            <a href="/settings" class="nav-item">
-                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v6m0 6v6m5.6-14.6l-4.2 4.2m-2.8 2.8l-4.2 4.2M23 12h-6m-6 0H1m20.6 5.6l-4.2-4.2m-2.8-2.8l-4.2-4.2"></path>
-                </svg>
-            </a>
+                Price Chart
+            </h3>
+            <div class="h-48 sm:h-64 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 text-sm">
+                Trade chart visualization (Phase 2)
+            </div>
         </div>
     </div>
 
-    <script>
-        async function loadTradeDetails() {
-            // TODO: Get trade ID from URL parameter and fetch details
-            const urlParams = new URLSearchParams(window.location.search);
-            const tradeId = urlParams.get('id');
-            
-            if (tradeId) {
-                // TODO: Fetch from backend API
-                console.log('Loading trade:', tradeId);
-            }
-        }
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div class="flex justify-around items-center h-16">
+            <a href="/dashboard" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="/chart" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span class="text-xs mt-1">Chart</span>
+            </a>
+            <a href="/trade" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                <span class="text-xs mt-1">Trade</span>
+            </a>
+            <a href="/history" class="flex flex-col items-center justify-center flex-1 text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-xs mt-1 font-semibold">History</span>
+            </a>
+            <a href="/settings" class="flex flex-col items-center justify-center flex-1 text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-xs mt-1">Settings</span>
+            </a>
+        </div>
+    </nav>
+</div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadTradeDetails();
-        });
-    </script>
-</body>
-</html>
+<style>
+.trade-detail-bg {
+    background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 40%, #C8E6D0 100%);
+    opacity: 0.3;
+}
+</style>
 
+<script>
+// Load trade details
+async function loadTradeDetails() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tradeId = urlParams.get('id');
+    
+    if (!tradeId) {
+        console.error('No trade ID provided');
+        showError('No trade ID specified');
+        return;
+    }
+    
+    try {
+        // TODO: Fetch from backend API when available
+        // const response = await fetch(`/api/trades/${tradeId}`);
+        // const trade = await response.json();
+        
+        // For now, show placeholder
+        showError('Trade details API not yet implemented (Phase 2)');
+        
+    } catch (error) {
+        console.error('Failed to load trade details:', error);
+        showError('Failed to load trade details');
+    }
+}
+
+// Show error message
+function showError(message) {
+    document.getElementById('pnl-amount').textContent = '--';
+    document.getElementById('status-badge').textContent = message;
+    document.getElementById('status-badge').className = 'inline-block px-4 py-2 rounded-full text-sm font-bold bg-gray-200 text-gray-600';
+}
+
+// Format currency
+function formatCurrency(amount) {
+    return '$' + parseFloat(amount).toFixed(2);
+}
+
+// Format date/time
+function formatDateTime(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// Initialize
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadTradeDetails);
+} else {
+    loadTradeDetails();
+}
+</script>
+{% endblock %}

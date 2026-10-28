@@ -5,13 +5,16 @@
     plan: free
     branch: main
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn run:app
+    startCommand: gunicorn run:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120 --access-logfile - --error-logfile - --log-level info
+    healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.11
-      - key: DERIV_APP_ID
-        sync: false
-      - key: DERIV_CLIENT_SECRET
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: False
+      - key: CLIENT_ID
         sync: false
       - key: REDIRECT_URI
         sync: false
@@ -21,6 +24,10 @@
         sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: OAUTH_SCOPES
+        value: trade,read,admin
       - key: DERIV_API_URL
         value: https://api.deriv.com
       - key: DERIV_OAUTH_URL

@@ -1,219 +1,232 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTS Trade - Onboarding</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(180deg, #F5F0E8 0%, #F5F0E8 30%, #E8D5F0 70%, #D4C5E8 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
-            margin: 0;
-        }
+{% block title %}HTS Trade - Onboarding{% endblock %}
 
-        .container {
-            width: 100%;
-            max-width: 428px;
-            min-height: 100vh;
-            background: linear-gradient(180deg, #F5F0E8 0%, #F5F0E8 30%, #E8D5F0 70%, #D4C5E8 100%);
-            display: flex;
-            flex-direction: column;
-            padding: 20px 24px 40px;
-        }
+{% block extra_css %}
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    /* Step-specific gradient backgrounds */
+    .step-1-bg {
+        background: linear-gradient(180deg, #F5F0E8 0%, #F5F0E8 30%, #E8D5F0 70%, #D4C5E8 100%);
+    }
+    .step-2-bg {
+        background: linear-gradient(180deg, #F5F0E8 0%, #E8D5F0 40%, #C8E6D0 100%);
+    }
+    .step-3-bg {
+        background: linear-gradient(180deg, #E8D5F0 0%, #F5F0E8 50%, #C8E6D0 100%);
+    }
+    
+    /* Hide inactive steps */
+    .step {
+        display: none;
+    }
+    .step.active {
+        display: flex;
+    }
+    
+    /* Smooth transitions */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
 
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            margin-bottom: 40px;
-        }
-
-        .page-indicator {
-            font-size: 14px;
-            color: #999;
-            font-weight: 500;
-        }
-
-        .skip-btn {
-            color: #D4AF37;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .skip-btn:hover {
-            opacity: 0.8;
-        }
-
-        .logo-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 60px 0 80px;
-            position: relative;
-        }
-
-        .logo-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #FDFCFA 0%, #FFFFFF 50%, #F8F6F3 100%);
-            border: 8px solid #D4AF37;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.25);
-            position: relative;
-            overflow: hidden;
-            padding: 0;
-        }
-
-        .logo-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        .content-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            flex: 1;
-        }
-
-        .headline {
-            font-size: 28px;
-            font-weight: 700;
-            color: #000000;
-            margin-bottom: 16px;
-            line-height: 1.2;
-        }
-
-        .description {
-            font-size: 15px;
-            color: #666666;
-            line-height: 1.6;
-            margin-bottom: 50px;
-            max-width: 320px;
-        }
-
-        .description .highlight {
-            color: #D4AF37;
-            font-weight: 600;
-        }
-
-        .pagination {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 30px;
-        }
-
-        .dot {
-            width: 32px;
-            height: 4px;
-            border-radius: 2px;
-            background: #D0D0D0;
-            transition: all 0.3s ease;
-        }
-
-        .dot.active {
-            background: #D4AF37;
-            width: 40px;
-        }
-
-        .next-btn {
-            width: 100%;
-            max-width: 380px;
-            padding: 18px;
-            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
-            border: none;
-            border-radius: 28px;
-            color: #000000;
-            font-size: 17px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .next-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.45);
-        }
-
-        .next-btn:active {
-            transform: translateY(0);
-        }
-
-        @media (max-width: 428px) {
-            .container {
-                max-width: 100%;
-                padding: 16px 20px 30px;
-            }
-
-            .logo-section {
-                margin: 40px 0 60px;
-            }
-
-            .logo-circle {
-                width: 180px;
-                height: 180px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
+{% block content %}
+<div id="onboarding-container" class="min-h-screen flex justify-center items-center p-0">
+    <div class="w-full max-w-lg min-h-screen flex flex-col px-6 py-5 md:px-8 md:py-6">
+        
         <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="page-indicator">1/3</div>
-            <a href="#" class="skip-btn">Skip</a>
+        <div class="flex justify-between items-center py-3 mb-8 md:mb-10">
+            <div id="page-indicator" class="text-sm md:text-base text-gray-500 font-medium">1/3</div>
+            <a href="/dashboard" id="skip-btn" class="text-sm md:text-base text-yellow-600 font-semibold hover:opacity-80 transition">Skip</a>
         </div>
 
-        <!-- Logo Section -->
-        <div class="logo-section">
-            <div class="logo-circle">
-                <img src="/img/download.png" alt="HTS TRADE">
+        <!-- STEP 1: Welcome -->
+        <div id="step-1" class="step active flex-col flex-1 fade-in">
+            <!-- Logo Section -->
+            <div class="flex flex-col items-center my-12 md:my-16">
+                <div class="w-44 h-44 md:w-52 md:h-52 rounded-full bg-gradient-to-br from-gray-50 via-white to-gray-100 border-8 border-yellow-500 flex items-center justify-center shadow-2xl overflow-hidden">
+                    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="HTS TRADE" class="w-full h-full object-cover rounded-full">
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex flex-col items-center text-center flex-1">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">Trade with precision</h1>
+                <p class="text-base md:text-lg text-gray-600 leading-relaxed mb-12 max-w-xs">
+                    HTS Trade runs your strategies on <span class="text-yellow-600 font-semibold">Deriv</span> around the clock, while you stay in control.
+                </p>
+
+                <!-- Pagination -->
+                <div class="flex gap-2 mb-8">
+                    <div class="w-10 h-1 rounded-full bg-yellow-500"></div>
+                    <div class="w-8 h-1 rounded-full bg-gray-300"></div>
+                    <div class="w-8 h-1 rounded-full bg-gray-300"></div>
+                </div>
+
+                <!-- Next Button -->
+                <button onclick="nextStep()" class="w-full max-w-md px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-full text-gray-900 text-base md:text-lg font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                    Next
+                </button>
             </div>
         </div>
 
-        <!-- Content Section -->
-        <div class="content-section">
-            <h1 class="headline">Trade with precision</h1>
-            <p class="description">
-                HTS Trade runs your strategies on <span class="highlight">Deriv</span> around the clock, while you stay in control.
-            </p>
+        <!-- STEP 2: Choose Strategy -->
+        <div id="step-2" class="step flex-col flex-1 fade-in">
+            <!-- Strategies Section -->
+            <div class="flex flex-col gap-3 mb-8 md:mb-12">
+                <!-- Strategy 1 -->
+                <div class="bg-white bg-opacity-90 rounded-2xl p-5 md:p-6 flex justify-between items-center shadow-sm">
+                    <div class="flex flex-col gap-1">
+                        <div class="text-base md:text-lg font-semibold text-gray-900">Momentum Rider</div>
+                        <div class="text-sm text-purple-600 font-medium">Rise / Fall</div>
+                    </div>
+                    <div class="relative w-12 h-7 bg-green-500 rounded-full cursor-pointer">
+                        <div class="absolute w-6 h-6 bg-white rounded-full top-0.5 right-0.5 shadow-sm"></div>
+                    </div>
+                </div>
 
-            <!-- Pagination Dots -->
-            <div class="pagination">
-                <div class="dot active"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
+                <!-- Strategy 2 -->
+                <div class="bg-white bg-opacity-90 rounded-2xl p-5 md:p-6 flex justify-between items-center shadow-sm">
+                    <div class="flex flex-col gap-1">
+                        <div class="text-base md:text-lg font-semibold text-gray-900">Digit Edge</div>
+                        <div class="text-sm text-purple-600 font-medium">Digits</div>
+                    </div>
+                    <div class="relative w-12 h-7 bg-gray-300 rounded-full cursor-pointer">
+                        <div class="absolute w-6 h-6 bg-white rounded-full top-0.5 left-0.5 shadow-sm"></div>
+                    </div>
+                </div>
+
+                <!-- Strategy 3 -->
+                <div class="bg-white bg-opacity-90 rounded-2xl p-5 md:p-6 flex justify-between items-center shadow-sm">
+                    <div class="flex flex-col gap-1">
+                        <div class="text-base md:text-lg font-semibold text-gray-900">Multiplier Guard</div>
+                        <div class="text-sm text-purple-600 font-medium">Multipliers</div>
+                    </div>
+                    <div class="relative w-12 h-7 bg-green-500 rounded-full cursor-pointer">
+                        <div class="absolute w-6 h-6 bg-white rounded-full top-0.5 right-0.5 shadow-sm"></div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Next Button -->
-            <a href="/onboarding2" class="next-btn">Next</a>
+            <!-- Content -->
+            <div class="flex flex-col items-center text-center flex-1 mt-6">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">Choose your strategy</h1>
+                <p class="text-base md:text-lg text-gray-600 leading-relaxed mb-12 max-w-xs">
+                    Pick a contract type, set your risk, and switch strategies on or off in one tap.
+                </p>
+
+                <!-- Pagination -->
+                <div class="flex gap-2 mb-8">
+                    <div class="w-8 h-1 rounded-full bg-gray-300"></div>
+                    <div class="w-10 h-1 rounded-full bg-yellow-500"></div>
+                    <div class="w-8 h-1 rounded-full bg-gray-300"></div>
+                </div>
+
+                <!-- Next Button -->
+                <button onclick="nextStep()" class="w-full max-w-md px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-full text-gray-900 text-base md:text-lg font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                    Next
+                </button>
+            </div>
         </div>
+
+        <!-- STEP 3: Protected Limits -->
+        <div id="step-3" class="step flex-col flex-1 fade-in">
+            <!-- Icon Section -->
+            <div class="flex flex-col items-center my-8 md:my-12">
+                <div class="w-40 h-40 md:w-44 md:h-44 rounded-full bg-gradient-to-br from-white to-gray-100 flex items-center justify-center shadow-xl mb-6">
+                    <svg class="w-16 h-16 md:w-20 md:h-20" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M35 5L10 15V32.5C10 47.5 19.5 61.5 35 65C50.5 61.5 60 47.5 60 32.5V15L35 5Z" stroke="#7B61FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <path d="M25 35L31 41L45 27" stroke="#7B61FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+                <!-- Limits Labels -->
+                <div class="flex flex-wrap gap-3 justify-center">
+                    <div class="px-4 py-2 rounded-full bg-white bg-opacity-70 text-sm font-semibold text-red-600">
+                        Stop-loss $50.00
+                    </div>
+                    <div class="px-4 py-2 rounded-full bg-white bg-opacity-70 text-sm font-semibold text-gray-700">
+                        Daily limit $100.00
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex flex-col items-center text-center flex-1 mt-4">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">Protected by your limits</h1>
+                <p class="text-base md:text-lg text-gray-600 leading-relaxed mb-12 max-w-xs">
+                    Stop-loss and daily loss limits guard your balance. Connect your Deriv account to begin.
+                </p>
+
+                <!-- Pagination -->
+                <div class="flex gap-2 mb-8">
+                    <div class="w-8 h-1 rounded-full bg-gray-300"></div>
+                    <div class="w-8 h-1 rounded-full bg-gray-300"></div>
+                    <div class="w-10 h-1 rounded-full bg-yellow-500"></div>
+                </div>
+
+                <!-- Get Started Button -->
+                <a href="/login?direct=1" class="w-full max-w-md px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-full text-gray-900 text-base md:text-lg font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-center">
+                    Get Started
+                </a>
+            </div>
+        </div>
+
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
 
+{% block extra_js %}
+<script>
+    let currentStep = 1;
+    const totalSteps = 3;
 
+    function updateBackground() {
+        const container = document.getElementById('onboarding-container');
+        container.className = `min-h-screen flex justify-center items-center p-0 step-${currentStep}-bg`;
+    }
 
+    function updateIndicator() {
+        document.getElementById('page-indicator').textContent = `${currentStep}/${totalSteps}`;
+        
+        // Hide skip button on last step
+        const skipBtn = document.getElementById('skip-btn');
+        if (currentStep === totalSteps) {
+            skipBtn.style.visibility = 'hidden';
+        } else {
+            skipBtn.style.visibility = 'visible';
+        }
+    }
+
+    function nextStep() {
+        if (currentStep < totalSteps) {
+            // Hide current step
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            
+            // Move to next step
+            currentStep++;
+            
+            // Show next step
+            const nextStepElement = document.getElementById(`step-${currentStep}`);
+            nextStepElement.classList.add('active');
+            nextStepElement.classList.add('fade-in');
+            
+            // Update UI
+            updateBackground();
+            updateIndicator();
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+    }
+
+    // Initialize
+    updateBackground();
+    updateIndicator();
+</script>
+{% endblock %}
