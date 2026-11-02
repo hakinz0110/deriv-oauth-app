@@ -286,6 +286,14 @@ def health():
         'service': 'Deriv OAuth Server'
     })
 
+@auth_bp.route('/static-debug/account-selector.js')
+def serve_account_selector():
+    """Debug route to serve account-selector.js directly."""
+    from flask import send_from_directory
+    import os
+    static_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+    return send_from_directory(static_folder, 'account-selector.js', mimetype='application/javascript')
+
 @auth_bp.route('/test-url')
 def test_url():
     """Generate and display OAuth URL without redirecting."""
