@@ -6,7 +6,7 @@ gunicorn==21.2.0
 websocket-client==1.6.4
 supabase==2.3.0
 postgrest==0.13.0
-pandas-ta==0.3.14b0
+pandas-ta==0.4.71b0
 pandas==2.1.4
 numpy==1.26.2
 Flask-Limiter==3.5.0
