@@ -91,20 +91,28 @@ class AccountSelector {
      * Attach click listeners to account selector triggers
      */
     attachEventListeners() {
+        console.log('[AccountSelector] Attaching event listeners...');
+        
         // Dashboard header account selector trigger
         const headerTrigger = document.getElementById('account-selector-trigger');
         if (headerTrigger) {
+            console.log('[AccountSelector] Found header trigger, attaching click handler');
             headerTrigger.addEventListener('click', (e) => {
+                console.log('[AccountSelector] Header trigger clicked');
                 e.stopPropagation();
                 this.toggleDropdown();
             });
+        } else {
+            console.warn('[AccountSelector] Header trigger not found!');
         }
 
         // Legacy: Dashboard account type badge (fallback)
         const accountTypeBadge = document.querySelector('.demo-badge');
         if (accountTypeBadge) {
+            console.log('[AccountSelector] Found legacy badge trigger');
             accountTypeBadge.style.cursor = 'pointer';
             accountTypeBadge.addEventListener('click', (e) => {
+                console.log('[AccountSelector] Legacy badge clicked');
                 e.stopPropagation();
                 this.toggleDropdown();
             });
@@ -113,7 +121,9 @@ class AccountSelector {
         // Settings account selector trigger (if exists)
         const settingsSelector = document.getElementById('settings-account-selector');
         if (settingsSelector) {
+            console.log('[AccountSelector] Found settings selector trigger');
             settingsSelector.addEventListener('click', (e) => {
+                console.log('[AccountSelector] Settings selector clicked');
                 e.stopPropagation();
                 this.toggleDropdown();
             });
@@ -122,15 +132,19 @@ class AccountSelector {
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (this.isOpen && !e.target.closest('.account-dropdown')) {
+                console.log('[AccountSelector] Closing dropdown (outside click)');
                 this.closeDropdown();
             }
         });
+        
+        console.log('[AccountSelector] Event listeners attached successfully');
     }
 
     /**
      * Toggle dropdown visibility
      */
     toggleDropdown() {
+        console.log('[AccountSelector] Toggle dropdown called, currently open:', this.isOpen);
         if (this.isOpen) {
             this.closeDropdown();
         } else {
@@ -142,23 +156,29 @@ class AccountSelector {
      * Open the account selector dropdown
      */
     async openDropdown() {
+        console.log('[AccountSelector] Opening dropdown...');
+        
         // Update bot status before opening
         await this.updateBotStatus();
+        console.log('[AccountSelector] Bot status:', this.isBotRunning ? 'RUNNING' : 'STOPPED');
 
         // Remove existing dropdown if any
         const existing = document.getElementById('account-selector-dropdown');
         if (existing) {
+            console.log('[AccountSelector] Removing existing dropdown');
             existing.remove();
         }
 
         // Create dropdown overlay
         const dropdown = this.createDropdown();
         document.body.appendChild(dropdown);
+        console.log('[AccountSelector] Dropdown created with', this.accounts.length, 'accounts');
 
         // Position dropdown
         this.positionDropdown(dropdown);
 
         this.isOpen = true;
+        console.log('[AccountSelector] Dropdown opened successfully');
     }
 
     /**
