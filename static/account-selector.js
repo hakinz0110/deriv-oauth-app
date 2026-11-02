@@ -67,12 +67,23 @@ class AccountSelector {
     }
 
     /**
-     * Update bot running status from UI
+     * Update bot running status from API
      */
-    updateBotStatus() {
-        const statusDot = document.getElementById('bot-status-dot');
-        if (statusDot) {
-            this.isBotRunning = statusDot.classList.contains('running');
+    async updateBotStatus() {
+        try {
+            const response = await fetch('/api/bot/status', {
+                credentials: 'same-origin'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.isBotRunning = (data.status === 'running');
+            } else {
+                this.isBotRunning = false;
+            }
+        } catch (error) {
+            console.error('Error checking bot status:', error);
+            this.isBotRunning = false;
         }
     }
 
@@ -130,9 +141,9 @@ class AccountSelector {
     /**
      * Open the account selector dropdown
      */
-    openDropdown() {
+    async openDropdown() {
         // Update bot status before opening
-        this.updateBotStatus();
+        await this.updateBotStatus();
 
         // Remove existing dropdown if any
         const existing = document.getElementById('account-selector-dropdown');
@@ -243,14 +254,42 @@ class AccountSelector {
      * Select a trading account
      */
     async selectAccount(accountId) {
-        if (this.isBotRunning) {
-            alert('Please stop the bot before switching accounts');
-            return;
-        }
-
         if (accountId === this.selectedAccountId) {
             this.closeDropdown();
             return;
+        }
+
+        // Check bot status before switching
+        if (this.isBotRunning) {
+            const shouldStop = confirm(
+                'Bot is currently running!\n\n' +
+                'You must stop the bot before switching accounts.\n\n' +
+                'Click OK to stop bot and switch, or Cancel to keep current account.'
+            );
+            
+            if (!shouldStop) {
+                this.closeDropdown();
+                return;
+            }
+
+            // Stop the bot first
+            try {
+                const stopResponse = await fetch('/api/bot/stop', {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+
+                if (!stopResponse.ok) {
+                    throw new Error('Failed to stop bot');
+                }
+
+                console.log('Bot stopped successfully');
+            } catch (error) {
+                console.error('Error stopping bot:', error);
+                alert('Failed to stop bot. Please try stopping it manually first.');
+                this.closeDropdown();
+                return;
+            }
         }
 
         try {
@@ -276,25 +315,43 @@ class AccountSelector {
                 throw new Error('Failed to select account');
             }
 
+            const result = await response.json();
+            console.log('Account selection response:', result);
+
             // Update local state
             this.selectedAccountId = accountId;
 
             // Close dropdown
             this.closeDropdown();
 
-            // Trigger callback (reconnect WebSocket)
-            if (this.onAccountSwitch) {
-                await this.onAccountSwitch(account);
-            }
-
             // Update UI immediately
             this.updateUIWithAccount(account);
 
-            console.log('Account switched successfully:', accountId);
+            // Trigger callback if provided
+            if (this.onAccountSwitch) {
+                const callbackResult = await this.onAccountSwitch(account);
+                // If callback returns false, don't reload
+                if (callbackResult === false) {
+                    return;
+                }
+            }
+
+            // Reload page to refresh all data with new account
+            console.log('Reloading page to apply account switch...');
+            window.location.reload();
 
         } catch (error) {
             console.error('Error selecting account:', error);
             alert('Failed to switch account. Please try again.');
+            // Reset loading state
+            this.loadSelectedAccount().then(() => {
+                if (this.selectedAccountId) {
+                    const account = this.accounts.find(acc => acc.account_id === this.selectedAccountId);
+                    if (account) {
+                        this.updateUIWithAccount(account);
+                    }
+                }
+            });
         }
     }
 

@@ -500,36 +500,9 @@
         }
     });
 
-    // Initialize account selector with bot safety check
+    // Initialize account selector
     const accountSelector = new AccountSelector();
-    accountSelector.initialize(async (newAccount) => {
-        // Check if bot is running before switching
-        const botStatus = await fetch('/api/bot/status', { credentials: 'same-origin' })
-            .then(r => r.json())
-            .catch(() => ({ status: 'stopped' }));
-        
-        if (botStatus.status === 'running') {
-            // Show safety prompt
-            const shouldStop = confirm(`Bot is currently running!\n\nYou must stop the bot before switching accounts.\n\nClick OK to stop bot and switch, or Cancel to keep current account.`);
-            
-            if (shouldStop) {
-                // Stop bot
-                await fetch('/api/bot/stop', { 
-                    method: 'POST', 
-                    credentials: 'same-origin' 
-                });
-                
-                // Reload page to switch account
-                window.location.reload();
-            } else {
-                // User cancelled, revert selection
-                return false;
-            }
-        } else {
-            // No bot running, safe to switch - reload page
-            window.location.reload();
-        }
-    });
+    accountSelector.initialize();
 
     // Update dashboard compact widget
     function updateDashboardWidget(data) {
