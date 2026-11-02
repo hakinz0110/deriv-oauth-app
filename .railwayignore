@@ -1,0 +1,17 @@
+# Railway ignore file - force clean rebuild
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.venv/
+venv/
+ENV/
+env/
+.git/

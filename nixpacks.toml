@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ['python312']
+
+[phases.install]
+cmds = ['pip install -r requirements.txt']
+
+[phases.build]
+cmds = ['echo "Build phase - forcing cache bust"']
+
+[start]
+cmd = 'gunicorn --bind 0.0.0.0:$PORT --workers $WEB_CONCURRENCY --timeout $TIMEOUT wsgi:app'
