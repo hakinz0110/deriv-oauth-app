@@ -1111,8 +1111,6 @@ def sell_contract():
             'message': 'Failed to prepare sell request'
         }), 500
 
-            "price": 0                    // Optional: Minimum willing to accept (default: 0 for market)
-        }
     
     Returns:
         JSON with sell message to send via WebSocket
