@@ -1,0 +1,4 @@
+# Railway deployment - keep all static files
+!static/
+!static/*.js
+!static/css/
