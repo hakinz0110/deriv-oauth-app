@@ -20,7 +20,7 @@ html, body {
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #0B1F4B;
-    background: url('/static/img/Universal_BG.png') no-repeat center center fixed;
+    background: url('/img/Universal_BG.png') no-repeat center center fixed;
     background-size: cover;
     position: relative;
     overflow-x: hidden;
