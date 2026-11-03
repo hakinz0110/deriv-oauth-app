@@ -145,6 +145,11 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Load authentication and data scripts -->
+<script src="{{ url_for('static', filename='auth-check.js') }}?v=20261103"></script>
+<script src="{{ url_for('static', filename='cache-loader.js') }}?v=20261103"></script>
+<script src="{{ url_for('static', filename='deriv-websocket.js') }}?v=20261103"></script>
+
 <script>
     async function loadAccountProfile() {
         try {

@@ -52,12 +52,21 @@ function updateUIWithAccount(account) {
     }
 }
 
-// Run on page load
+// Run on page load - but ONLY on protected pages (not login/onboarding)
 document.addEventListener('DOMContentLoaded', async () => {
+    // Skip auth check on public pages
+    const publicPages = ['/login', '/callback', '/onboarding'];
+    const currentPath = window.location.pathname;
+    
+    if (publicPages.some(page => currentPath.startsWith(page))) {
+        console.debug('Public page - skipping auth check');
+        return;
+    }
+    
     const isAuth = await checkAuthentication();
     
     if (!isAuth) {
-        // Show loading or redirect
-        console.log('Waiting for authentication...');
+        // Redirect will happen in checkAuthentication()
+        console.debug('Auth check: redirecting to login');
     }
 });

@@ -701,9 +701,7 @@
             window.AccountSelector = AccountSelector;
         }
     </script>
-    <script src="{{ url_for('static', filename='auth-check.js') }}?v=20261103"></script>
-    <script src="{{ url_for('static', filename='cache-loader.js') }}?v=20261103"></script>
-    <script src="{{ url_for('static', filename='deriv-websocket.js') }}?v=20261103"></script>
+    <!-- Auth-check, cache-loader, and websocket are loaded conditionally by pages that need them -->
     <script src="{{ url_for('static', filename='notification-center.js') }}?v=20261103"></script>
     
     <!-- Master Kill Switch Script -->
@@ -855,6 +853,16 @@
 
             // Only initialize kill switch on authenticated pages
             if (killSwitchButton) {
+                // Skip on public pages (login, onboarding, callback)
+                const publicPages = ['/login', '/callback', '/onboarding'];
+                const currentPath = window.location.pathname;
+                
+                if (publicPages.some(page => currentPath.startsWith(page))) {
+                    console.debug('Public page - kill switch disabled');
+                    killSwitchButton.classList.add('hidden');
+                    return;
+                }
+                
                 // Check authentication before initializing
                 fetch('/accounts/selected')
                     .then(response => {
