@@ -851,6 +851,11 @@
                     killSwitchManager.stopPolling();
                 }
             });
+
+            // Only initialize kill switch on authenticated pages (where button exists)
+            if (killSwitchButton) {
+                document.addEventListener('DOMContentLoaded', initKillSwitch);
+            }
         })();
     </script>
     

@@ -381,6 +381,7 @@ class DerivWebSocketClient {
             this.ws = null;
             this.connected = false;
         }
+    }
 
     async reconnect() {
         console.log('Reconnecting WebSocket for account switch...');
