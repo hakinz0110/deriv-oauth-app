@@ -1116,68 +1116,6 @@ def sell_contract():
 # ============================================
 # TRADING SYSTEMS API ENDPOINTS
 # ============================================
-
-@auth_bp.route('/api/trading-systems', methods=['GET'])
-@require_authentication
-def get_trading_systems():
-    """
-    Get all trading systems for the authenticated user.
-    
-    Query Parameters:
-        active_only: If true, returns only active systems (optional)
-        entry_type: Filter by entry strategy type (optional)
-        position_type: Filter by position sizing type (optional)
-    
-    Returns:
-        JSON with user's trading systems
-    """
-    try:
-        from app.trading_system_service import TradingSystemService
-        
-        selected_account = SessionService.get_selected_account()
-        if not selected_account:
-            return jsonify({
-                'error': 'NO_ACCOUNT',
-                'message': 'No account selected'
-            }), 400
-        
-        user_id = selected_account.get('account_id')
-        
-        # Get query parameters
-        active_only = request.args.get('active_only', 'false').lower() == 'true'
-        entry_type = request.args.get('entry_type')
-        position_type = request.args.get('position_type')
-        
-        # Fetch trading systems
-        systems = TradingSystemService.get_trading_systems(
-            user_id=user_id,
-            active_only=active_only,
-            entry_type=entry_type,
-            position_type=position_type
-        )
-        
-        return jsonify({
-            'status': 'success',
-            'systems': systems,
-            'account_id': account_id,
-            'contract_id': contract_id,
-            'min_price': price
-        })
-        
-    except TradeServiceError as e:
-        return jsonify(e.to_dict()), 400
-    except Exception as e:
-        from flask import current_app
-        current_app.logger.error(f'Sell request failed: {str(e)}')
-        return jsonify({
-            'error': 'REQUEST_FAILED',
-            'message': 'Failed to prepare sell request'
-        }), 500
-
-# ============================================
-# TRADING SYSTEMS API ENDPOINTS
-# ============================================
-
 @auth_bp.route('/api/trading-systems', methods=['GET'])
 @require_authentication
 def get_trading_systems():
