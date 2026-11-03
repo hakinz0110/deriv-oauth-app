@@ -600,7 +600,7 @@
     if (typeof BotStatusManager !== 'undefined' && botManager && typeof botManager.startPolling === 'function') {
         botManager.startPolling();
     } else {
-        console.error('BotStatusManager not loaded properly');
+        console.debug('BotStatusManager not loaded yet - this is expected on first load');
     }
     
     // Check if user is admin and show admin button
