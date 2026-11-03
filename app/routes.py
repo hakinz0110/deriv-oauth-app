@@ -195,19 +195,8 @@ def logout():
 @auth_bp.route('/dashboard')
 @require_authentication
 def dashboard():
-    """Dashboard/Home screen with pre-loaded account info to prevent UI flicker."""
-    # Pre-load selected account to prevent flicker on page load
-    from app.session_service import get_selected_account
-    try:
-        selected_account = get_selected_account()
-        account_type = selected_account.get('account_type', 'N/A') if selected_account else 'N/A'
-        account_currency = selected_account.get('currency', 'USD') if selected_account else 'USD'
-        account_display = f"{account_type.title()} · {account_currency}" if account_type != 'N/A' else 'N/A'
-    except Exception as e:
-        print(f"Error pre-loading account: {e}")
-        account_display = 'N/A'
-    
-    return render_template('dashboard.html', account_display=account_display)
+    """Dashboard/Home screen."""
+    return render_template('dashboard.html')
 
 @auth_bp.route('/select-account')
 @require_authentication
