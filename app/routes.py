@@ -1111,48 +1111,54 @@ def sell_contract():
             'message': 'Failed to prepare sell request'
         }), 500
 
+
+
+# ============================================
+# TRADING SYSTEMS API ENDPOINTS
+# ============================================
+
+@auth_bp.route('/api/trading-systems', methods=['GET'])
+@require_authentication
+def get_trading_systems():
+    """
+    Get all trading systems for the authenticated user.
+    
+    Query Parameters:
+        active_only: If true, returns only active systems (optional)
+        entry_type: Filter by entry strategy type (optional)
+        position_type: Filter by position sizing type (optional)
     
     Returns:
-        JSON with sell message to send via WebSocket
-        
-    Security:
-        - Requires authentication
-        - Logs all sell attempts with WARNING level
-        - Frontend must implement confirmation dialog
+        JSON with user's trading systems
     """
     try:
-        data = request.get_json()
+        from app.trading_system_service import TradingSystemService
         
-        if not data:
-            return jsonify({
-                'error': 'INVALID_REQUEST',
-                'message': 'Request body is required'
-            }), 400
-        
-        contract_id = data.get('contract_id')
-        price = data.get('price', 0)  # Default to 0 (market price)
-        
-        if not contract_id:
-            return jsonify({
-                'error': 'MISSING_CONTRACT_ID',
-                'message': 'contract_id is required'
-            }), 400
-        
-        # Prepare sell message (validation happens in service)
-        sell_message = TradeService.sell_contract(
-            contract_id=contract_id,
-            price=price
-        )
-        
-        # Get selected account for context
         selected_account = SessionService.get_selected_account()
-        account_id = selected_account.get('account_id') if selected_account else 'unknown'
+        if not selected_account:
+            return jsonify({
+                'error': 'NO_ACCOUNT',
+                'message': 'No account selected'
+            }), 400
+        
+        user_id = selected_account.get('account_id')
+        
+        # Get query parameters
+        active_only = request.args.get('active_only', 'false').lower() == 'true'
+        entry_type = request.args.get('entry_type')
+        position_type = request.args.get('position_type')
+        
+        # Fetch trading systems
+        systems = TradingSystemService.get_trading_systems(
+            user_id=user_id,
+            active_only=active_only,
+            entry_type=entry_type,
+            position_type=position_type
+        )
         
         return jsonify({
             'status': 'success',
-            'message': 'Sell request prepared - REQUIRES USER CONFIRMATION',
-            'sell_message': sell_message,
-            'warning': '⚠️ Send this message ONLY after user confirms the sale',
+            'systems': systems,
             'account_id': account_id,
             'contract_id': contract_id,
             'min_price': price
