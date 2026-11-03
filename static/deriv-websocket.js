@@ -78,6 +78,13 @@ class DerivWebSocketClient {
 
         console.log('Loading cached data (age:', Math.round(cached._age / 1000), 'seconds)');
         
+        // IMPORTANT: Don't show cached data if it's more than 10 seconds old
+        // This prevents showing stale account selections
+        if (cached._age > 10000) {
+            console.warn('Cache too old, skipping cached data display');
+            return;
+        }
+        
         // Display cached balance
         if (cached.balance !== undefined) {
             this.updateBalance(cached.balance, true); // true = from cache
@@ -135,13 +142,19 @@ class DerivWebSocketClient {
                 
                 if (selectedRes.ok) {
                     const selectedData = await selectedRes.json();
+                    console.log('[DEBUG] Server returned selected account:', selectedData);
+                    
                     if (selectedData.selected_account && selectedData.selected_account.account_id) {
                         selectedAccount = selectedData.selected_account;
-                        console.log('Using existing selected account:', selectedAccount.account_id);
+                        console.log('Using existing selected account:', selectedAccount.account_id, selectedAccount.account_type);
+                    } else {
+                        console.warn('[DEBUG] Server response missing account_id:', selectedData);
                     }
+                } else {
+                    console.warn('[DEBUG] /accounts/selected returned:', selectedRes.status);
                 }
             } catch (error) {
-                console.debug('No existing account selection, will auto-select');
+                console.debug('No existing account selection, will auto-select', error);
             }
             
             // 3. If no selection exists, select first active account

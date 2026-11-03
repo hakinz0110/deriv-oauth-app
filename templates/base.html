@@ -595,7 +595,10 @@
             }
 
             async selectAccount(accountId) {
+                console.log('[AccountSelector] User clicked account:', accountId);
+                
                 if (accountId === this.selectedAccountId) {
+                    console.log('[AccountSelector] Account already selected, closing dropdown');
                     this.closeDropdown();
                     return;
                 }
@@ -645,15 +648,23 @@
                     console.log('Account selection response:', result);
                     this.selectedAccountId = accountId;
                     this.closeDropdown();
+                    
+                    // IMMEDIATELY update UI before reload
                     this.updateUIWithAccount(account);
+                    
+                    // Clear cache to prevent showing old data on reload
+                    localStorage.removeItem('deriv_app_data');
+                    
                     if (this.onAccountSwitch) {
                         const callbackResult = await this.onAccountSwitch(account);
                         if (callbackResult === false) {
                             return;
                         }
                     }
+                    
                     console.log('Reloading page to apply account switch...');
-                    window.location.reload();
+                    // Force hard reload to bypass cache
+                    window.location.reload(true);
                 } catch (error) {
                     console.error('Error selecting account:', error);
                     alert('Failed to switch account. Please try again.');
