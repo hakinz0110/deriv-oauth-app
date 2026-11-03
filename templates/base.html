@@ -739,8 +739,10 @@
                         }
                     });
 
-                    // Start monitoring bot status
-                    killSwitchManager.startPolling();
+                    // Start monitoring bot status if method exists
+                    if (killSwitchManager && typeof killSwitchManager.startPolling === 'function') {
+                        killSwitchManager.startPolling();
+                    }
                 });
             }
 
@@ -855,7 +857,7 @@
 
             // Cleanup on page unload
             window.addEventListener('beforeunload', () => {
-                if (killSwitchManager) {
+                if (killSwitchManager && typeof killSwitchManager.stopPolling === 'function') {
                     killSwitchManager.stopPolling();
                 }
             });

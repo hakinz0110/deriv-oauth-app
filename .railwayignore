@@ -15,3 +15,8 @@ venv/
 ENV/
 env/
 .git/
+
+# Don't deploy test files
+tests/
+pytest.ini
+.pytest_cache/

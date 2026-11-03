@@ -55,3 +55,10 @@ instance/
 
 # Session data
 flask_session/
+
+# Test files - don't deploy to production
+tests/
+pytest.ini
+.pytest_cache/
+*.pyc
+__pycache__/
