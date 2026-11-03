@@ -570,6 +570,257 @@ def get_market_data_url():
     })
 
 
+@auth_bp.route('/api/chart/candles/<symbol>')
+def get_chart_candles(symbol):
+    """
+    Fetch historical candle data for a symbol.
+    Public endpoint - no authentication required.
+    
+    Query Parameters:
+        timeframe: Candle timeframe (1H, 4H, 1D) - default: 4H
+        count: Number of candles to fetch (default: 500, max: 5000)
+    
+    Returns:
+        JSON with candle data and metadata
+    """
+    import requests
+    from datetime import datetime, timedelta
+    
+    # Validate and parse parameters
+    timeframe = request.args.get('timeframe', '4H')
+    count = min(int(request.args.get('count', 500)), 5000)
+    
+    # Map timeframe to Deriv granularity (seconds)
+    timeframe_map = {
+        '1m': 60,
+        '5m': 300,
+        '15m': 900,
+        '30m': 1800,
+        '1H': 3600,
+        '2H': 7200,
+        '4H': 14400,
+        '8H': 28800,
+        '1D': 86400
+    }
+    
+    granularity = timeframe_map.get(timeframe, 14400)  # Default to 4H
+    
+    # Calculate time range
+    end_time = int(datetime.now().timestamp())
+    
+    try:
+        # Use Deriv API to fetch candle history
+        api_url = 'https://api.deriv.com/api/v1/ticks_history'
+        params = {
+            'ticks_history': symbol,
+            'adjust_start_time': 1,
+            'count': count,
+            'end': 'latest',
+            'granularity': granularity,
+            'style': 'candles'
+        }
+        
+        response = requests.get(api_url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        
+        if 'error' in data:
+            return jsonify({
+                'status': 'error',
+                'message': data['error'].get('message', 'Failed to fetch candles')
+            }), 400
+        
+        # Parse candles
+        if 'candles' in data:
+            candles = data['candles']
+            
+            # Format for LightweightCharts
+            formatted_candles = []
+            for candle in candles:
+                formatted_candles.append({
+                    'time': candle['epoch'],
+                    'open': float(candle['open']),
+                    'high': float(candle['high']),
+                    'low': float(candle['low']),
+                    'close': float(candle['close'])
+                })
+            
+            return jsonify({
+                'status': 'success',
+                'symbol': symbol,
+                'timeframe': timeframe,
+                'granularity': granularity,
+                'count': len(formatted_candles),
+                'candles': formatted_candles
+            })
+        
+        return jsonify({
+            'status': 'error',
+            'message': 'No candle data returned'
+        }), 404
+        
+    except requests.RequestException as e:
+        current_app.logger.error(f'Failed to fetch candles: {str(e)}')
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to fetch market data'
+        }), 500
+    except Exception as e:
+        current_app.logger.error(f'Error processing candles: {str(e)}')
+        return jsonify({
+            'status': 'error',
+            'message': 'Internal server error'
+        }), 500
+
+
+@auth_bp.route('/api/chart/indicators/<symbol>')
+def get_chart_indicators(symbol):
+    """
+    Calculate technical indicators for a symbol.
+    Public endpoint - no authentication required.
+    
+    Query Parameters:
+        timeframe: Candle timeframe (1H, 4H, 1D) - default: 4H
+        count: Number of candles for calculation (default: 200)
+    
+    Returns:
+        JSON with indicator values
+    """
+    import requests
+    import pandas as pd
+    from app.technical_indicators_service import TechnicalIndicatorsService
+    
+    # Validate and parse parameters
+    timeframe = request.args.get('timeframe', '4H')
+    count = min(int(request.args.get('count', 200)), 1000)
+    
+    # Map timeframe to Deriv granularity (seconds)
+    timeframe_map = {
+        '1m': 60,
+        '5m': 300,
+        '15m': 900,
+        '30m': 1800,
+        '1H': 3600,
+        '2H': 7200,
+        '4H': 14400,
+        '8H': 28800,
+        '1D': 86400
+    }
+    
+    granularity = timeframe_map.get(timeframe, 14400)
+    
+    try:
+        # Fetch candle data
+        api_url = 'https://api.deriv.com/api/v1/ticks_history'
+        params = {
+            'ticks_history': symbol,
+            'adjust_start_time': 1,
+            'count': count,
+            'end': 'latest',
+            'granularity': granularity,
+            'style': 'candles'
+        }
+        
+        response = requests.get(api_url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        
+        if 'error' in data:
+            return jsonify({
+                'status': 'error',
+                'message': data['error'].get('message', 'Failed to fetch data')
+            }), 400
+        
+        if 'candles' not in data or not data['candles']:
+            return jsonify({
+                'status': 'error',
+                'message': 'No candle data available'
+            }), 404
+        
+        # Convert to DataFrame
+        candles = data['candles']
+        df = pd.DataFrame(candles)
+        df['close'] = pd.to_numeric(df['close'])
+        df['open'] = pd.to_numeric(df['open'])
+        df['high'] = pd.to_numeric(df['high'])
+        df['low'] = pd.to_numeric(df['low'])
+        
+        # Calculate indicators using the service
+        indicators = TechnicalIndicatorsService.get_current_values(df)
+        
+        # Get OHLC info from last candle
+        last_candle = candles[-1]
+        
+        return jsonify({
+            'status': 'success',
+            'symbol': symbol,
+            'timeframe': timeframe,
+            'price': float(last_candle['close']),
+            'ohlc': {
+                'open': float(last_candle['open']),
+                'high': float(last_candle['high']),
+                'low': float(last_candle['low']),
+                'close': float(last_candle['close'])
+            },
+            'indicators': indicators
+        })
+        
+    except requests.RequestException as e:
+        current_app.logger.error(f'Failed to fetch data for indicators: {str(e)}')
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to fetch market data'
+        }), 500
+    except Exception as e:
+        current_app.logger.error(f'Error calculating indicators: {str(e)}')
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to calculate indicators'
+        }), 500
+
+
+@auth_bp.route('/api/chart/symbols')
+def get_available_symbols():
+    """
+    Get list of available trading symbols.
+    Public endpoint - no authentication required.
+    
+    Returns:
+        JSON with available symbols organized by category
+    """
+    # Common synthetic indices
+    symbols = {
+        'volatility_indices': [
+            {'symbol': 'R_10', 'name': 'Volatility 10 Index', 'description': '1 second ticks'},
+            {'symbol': 'R_25', 'name': 'Volatility 25 Index', 'description': '1 second ticks'},
+            {'symbol': 'R_50', 'name': 'Volatility 50 Index', 'description': '1 second ticks'},
+            {'symbol': 'R_75', 'name': 'Volatility 75 Index', 'description': '1 second ticks'},
+            {'symbol': 'R_100', 'name': 'Volatility 100 Index', 'description': '2 second ticks'},
+            {'symbol': '1HZ10V', 'name': 'Volatility 10 (1s) Index', 'description': '1 second ticks'},
+            {'symbol': '1HZ25V', 'name': 'Volatility 25 (1s) Index', 'description': '1 second ticks'},
+            {'symbol': '1HZ50V', 'name': 'Volatility 50 (1s) Index', 'description': '1 second ticks'},
+            {'symbol': '1HZ75V', 'name': 'Volatility 75 (1s) Index', 'description': '1 second ticks'},
+            {'symbol': '1HZ100V', 'name': 'Volatility 100 (1s) Index', 'description': '1 second ticks'}
+        ],
+        'crash_boom': [
+            {'symbol': 'BOOM300N', 'name': 'Boom 300 Index', 'description': 'Spikes up frequently'},
+            {'symbol': 'BOOM500', 'name': 'Boom 500 Index', 'description': 'Spikes up frequently'},
+            {'symbol': 'BOOM1000', 'name': 'Boom 1000 Index', 'description': 'Spikes up frequently'},
+            {'symbol': 'CRASH300N', 'name': 'Crash 300 Index', 'description': 'Drops frequently'},
+            {'symbol': 'CRASH500', 'name': 'Crash 500 Index', 'description': 'Drops frequently'},
+            {'symbol': 'CRASH1000', 'name': 'Crash 1000 Index', 'description': 'Drops frequently'}
+        ],
+        'step_indices': [
+            {'symbol': 'STPIDX', 'name': 'Step Index', 'description': 'Equal probability of steps'}
+        ]
+    }
+    
+    return jsonify({
+        'status': 'success',
+        'symbols': symbols
+    })
+
+
 
 
 @auth_bp.route('/api/save-balance', methods=['POST'])
