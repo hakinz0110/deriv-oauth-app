@@ -22,10 +22,6 @@ COPY . .
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV PORT=8080
 
-# Expose port
-EXPOSE 8080
-
-# Start gunicorn
-CMD gunicorn --bind 0.0.0.0:$PORT --workers ${WEB_CONCURRENCY:-2} --timeout ${TIMEOUT:-120} --access-logfile - --error-logfile - --log-level info wsgi:app
+# Start gunicorn - Railway sets PORT env var
+CMD gunicorn --bind 0.0.0.0:${PORT:-8080} --workers ${WEB_CONCURRENCY:-2} --timeout ${TIMEOUT:-120} --access-logfile - --error-logfile - --log-level info wsgi:app
