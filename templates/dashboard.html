@@ -6,7 +6,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
     .bg-dashboard {
-        background-image: url('/static/img/Universal_BG.png');
+        background-image: url('/img/Universal_BG.png');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -596,8 +596,12 @@
         }
     });
 
-    // Start polling when page loads
-    botManager.startPolling();
+    // Start polling when page loads (check if BotStatusManager is available)
+    if (typeof BotStatusManager !== 'undefined' && botManager && typeof botManager.startPolling === 'function') {
+        botManager.startPolling();
+    } else {
+        console.error('BotStatusManager not loaded properly');
+    }
     
     // Check if user is admin and show admin button
     async function checkAdminStatus() {
