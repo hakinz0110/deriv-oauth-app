@@ -45,6 +45,12 @@ class BotStatusManager {
             const response = await fetch('/api/bot/status');
             
             if (!response.ok) {
+                // If bot service returns 500, it's not implemented yet
+                if (response.status === 500) {
+                    console.debug('Bot service not available - stopping status polling');
+                    this.stop(); // Stop polling to prevent error spam
+                    return;
+                }
                 throw new Error(`HTTP ${response.status}`);
             }
             
@@ -63,11 +69,9 @@ class BotStatusManager {
                 });
             }
         } catch (error) {
-            console.error('Failed to fetch bot status:', error);
-            this.notifyListeners({
-                type: 'error',
-                message: 'Failed to fetch bot status'
-            });
+            // Silently handle errors if bot service isn't available
+            console.debug('Bot status check failed:', error.message);
+            // Don't notify listeners of errors to prevent UI noise
         }
     }
 
