@@ -60,6 +60,11 @@
     </div>
 
     <style>
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
         /* Master Kill Switch Styles */
         .master-kill-switch {
             position: fixed;
@@ -848,11 +853,27 @@
                 }
             });
 
-            // Initialize on page load
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initKillSwitch);
-            } else {
-                initKillSwitch();
+            // Only initialize kill switch on authenticated pages
+            if (killSwitchButton) {
+                // Check authentication before initializing
+                fetch('/accounts/selected')
+                    .then(response => {
+                        if (response.ok) {
+                            // User is authenticated, initialize kill switch
+                            if (document.readyState === 'loading') {
+                                document.addEventListener('DOMContentLoaded', initKillSwitch);
+                            } else {
+                                initKillSwitch();
+                            }
+                        } else {
+                            // Not authenticated - ensure kill switch stays hidden
+                            killSwitchButton.classList.add('hidden');
+                        }
+                    })
+                    .catch(() => {
+                        // On error, kill switch stays hidden
+                        killSwitchButton.classList.add('hidden');
+                    });
             }
 
             // Cleanup on page unload
@@ -861,22 +882,6 @@
                     killSwitchManager.stopPolling();
                 }
             });
-
-            // Only initialize kill switch on authenticated pages
-            if (killSwitchButton) {
-                // Check authentication before initializing
-                fetch('/accounts/selected')
-                    .then(response => {
-                        if (response.ok) {
-                            // User is authenticated, initialize kill switch
-                            document.addEventListener('DOMContentLoaded', initKillSwitch);
-                        }
-                        // If not authenticated (401), kill switch stays hidden
-                    })
-                    .catch(() => {
-                        // On error, kill switch stays hidden
-                    });
-            }
         })();
     </script>
     
