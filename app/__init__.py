@@ -21,26 +21,31 @@ def create_app():
         log_level = os.environ.get('LOG_LEVEL', 'INFO').upper()
         app.logger.setLevel(getattr(logging, log_level))
         
-        # Create logs directory if it doesn't exist
-        logs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'logs'))
-        if not os.path.exists(logs_dir):
-            os.mkdir(logs_dir)
+        # Try to create file logging if writable, otherwise use stdout only
+        try:
+            logs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'logs'))
+            if not os.path.exists(logs_dir):
+                os.makedirs(logs_dir, exist_ok=True)
+            
+            # File handler with rotation (10MB per file, keep 10 files)
+            file_handler = RotatingFileHandler(
+                os.path.join(logs_dir, 'hts_trade.log'),
+                maxBytes=10485760,  # 10MB
+                backupCount=10
+            )
+            
+            # Format: timestamp - level - module - message
+            formatter = logging.Formatter(
+                '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+            )
+            file_handler.setFormatter(formatter)
+            file_handler.setLevel(logging.INFO)
+            
+            app.logger.addHandler(file_handler)
+        except (OSError, PermissionError):
+            # If file logging fails (e.g., Railway read-only filesystem), just use stdout
+            pass
         
-        # File handler with rotation (10MB per file, keep 10 files)
-        file_handler = RotatingFileHandler(
-            os.path.join(logs_dir, 'hts_trade.log'),
-            maxBytes=10485760,  # 10MB
-            backupCount=10
-        )
-        
-        # Format: timestamp - level - module - message
-        formatter = logging.Formatter(
-            '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
-        )
-        file_handler.setFormatter(formatter)
-        file_handler.setLevel(logging.INFO)
-        
-        app.logger.addHandler(file_handler)
         app.logger.info('HTS Trade startup - Production mode')
     
     # ==================== END PRODUCTION LOGGING ====================
