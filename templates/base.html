@@ -21,8 +21,8 @@
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Master Kill Switch (Global Emergency Stop) -->
-    <button type="button" id="master-kill-switch" class="master-kill-switch" title="Emergency Stop - Pause Bot Immediately">
+    <!-- Master Kill Switch (Global Emergency Stop) - Hidden by default, shown only when bot is active -->
+    <button type="button" id="master-kill-switch" class="master-kill-switch hidden" title="Emergency Stop - Pause Bot Immediately">
         <svg class="kill-switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
             <circle cx="12" cy="12" r="10"/>
             <rect x="9" y="9" width="6" height="6" rx="1"/>
@@ -743,12 +743,17 @@
 
             // Update kill switch appearance based on bot status
             function updateKillSwitchState(status) {
-                if (status === 'stopped' || status === 'paused') {
-                    killSwitchButton.classList.add('activated');
-                    killSwitchButton.title = 'Bot Stopped - Click to view bot settings';
-                } else {
-                    killSwitchButton.classList.remove('activated');
+                if (status === 'running') {
+                    // Show kill switch only when bot is running
+                    killSwitchButton.classList.remove('hidden', 'activated');
                     killSwitchButton.title = 'Emergency Stop - Pause Bot Immediately';
+                } else if (status === 'stopped' || status === 'paused') {
+                    // Hide kill switch when bot is stopped/paused
+                    killSwitchButton.classList.add('hidden', 'activated');
+                    killSwitchButton.title = 'Bot Stopped';
+                } else {
+                    // Hide for any other status
+                    killSwitchButton.classList.add('hidden');
                 }
             }
 
@@ -852,9 +857,20 @@
                 }
             });
 
-            // Only initialize kill switch on authenticated pages (where button exists)
+            // Only initialize kill switch on authenticated pages
             if (killSwitchButton) {
-                document.addEventListener('DOMContentLoaded', initKillSwitch);
+                // Check authentication before initializing
+                fetch('/accounts/selected')
+                    .then(response => {
+                        if (response.ok) {
+                            // User is authenticated, initialize kill switch
+                            document.addEventListener('DOMContentLoaded', initKillSwitch);
+                        }
+                        // If not authenticated (401), kill switch stays hidden
+                    })
+                    .catch(() => {
+                        // On error, kill switch stays hidden
+                    });
             }
         })();
     </script>
