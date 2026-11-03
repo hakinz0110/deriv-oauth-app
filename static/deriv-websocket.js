@@ -124,42 +124,67 @@ class DerivWebSocketClient {
             // Cache accounts list
             this.cache.update('accounts', accountsData.accounts);
 
-            // 2. Select first active account
-            console.log('Step 2: Selecting account...');
-            const account = accountsData.accounts.find(acc => acc.status === 'active');
-            if (!account) {
-                console.error('No active account found');
-                this.showError('No active accounts available');
-                return;
+            // 2. Check if user already has a selected account
+            console.log('Step 2: Checking for existing selection...');
+            let selectedAccount = null;
+            
+            try {
+                const selectedRes = await fetch('/accounts/selected', {
+                    credentials: 'same-origin'
+                });
+                
+                if (selectedRes.ok) {
+                    const selectedData = await selectedRes.json();
+                    if (selectedData.selected_account && selectedData.selected_account.account_id) {
+                        selectedAccount = selectedData.selected_account;
+                        console.log('Using existing selected account:', selectedAccount.account_id);
+                    }
+                }
+            } catch (error) {
+                console.debug('No existing account selection, will auto-select');
             }
             
-            console.log('Selected account:', account.account_id, account.account_type);
-            
-            // Cache selected account
-            this.cache.update('account', account);
-            this.updateAccountInfo(account, false);
-
-            // 3. Select the account via API
-            console.log('Step 3: Setting selected account...');
-            const selectRes = await fetch('/accounts/select', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'same-origin',
-                body: JSON.stringify({ account_id: account.account_id })
-            });
-            
-            if (!selectRes.ok) {
-                console.error('Failed to select account:', selectRes.status);
-                const error = await selectRes.json().catch(() => ({}));
-                console.error('Error details:', error);
-                this.handleConnectionError('Failed to select account');
-                return;
+            // 3. If no selection exists, select first active account
+            if (!selectedAccount) {
+                console.log('Step 3: Auto-selecting first active account...');
+                selectedAccount = accountsData.accounts.find(acc => acc.status === 'active');
+                
+                if (!selectedAccount) {
+                    console.error('No active account found');
+                    this.showError('No active accounts available');
+                    return;
+                }
+                
+                console.log('Auto-selected account:', selectedAccount.account_id, selectedAccount.account_type);
+                
+                // Set the account selection via API
+                console.log('Step 4: Setting selected account...');
+                const selectRes = await fetch('/accounts/select', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ account_id: selectedAccount.account_id })
+                });
+                
+                if (!selectRes.ok) {
+                    console.error('Failed to select account:', selectRes.status);
+                    const error = await selectRes.json().catch(() => ({}));
+                    console.error('Error details:', error);
+                    this.handleConnectionError('Failed to select account');
+                    return;
+                }
+                
+                console.log('Account selected successfully');
+            } else {
+                console.log('Step 3-4: Using pre-selected account, skipping API call');
             }
             
-            console.log('Account selected successfully');
+            // Cache selected account and update UI
+            this.cache.update('account', selectedAccount);
+            this.updateAccountInfo(selectedAccount, false);
 
-            // 4. Get WebSocket URL with OTP
-            console.log('Step 4: Getting WebSocket URL...');
+            // 5. Get WebSocket URL with OTP
+            console.log('Step 5: Getting WebSocket URL...');
             const wsRes = await fetch('/websocket/url', {
                 credentials: 'same-origin'
             });
@@ -180,8 +205,8 @@ class DerivWebSocketClient {
                 return;
             }
 
-            // 5. Connect to WebSocket
-            console.log('Step 5: Connecting to WebSocket...');
+            // 6. Connecting to WebSocket...
+            console.log('Step 6: Connecting to WebSocket...');
             this.ws = new WebSocket(wsData.websocket_url);
 
             this.ws.onopen = () => {
