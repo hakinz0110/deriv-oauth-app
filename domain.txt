@@ -6,11 +6,11 @@ Dashboard:  https://deriv-oauth-app.onrender.com/dashboard
 Login:      https://deriv-oauth-app.onrender.com/login
 Health:     https://deriv-oauth-app.onrender.com/health
 
-## Railway (Secondary - Static File Issue with account-selector.js)
-Home/UI:    https://web-production-d675d.up.railway.app/
-Dashboard:  https://web-production-d675d.up.railway.app/dashboard
-Login:      https://web-production-d675d.up.railway.app/login
-Health:     https://web-production-d675d.up.railway.app/health
+## Railway (Secondary - Account Toggle Fixed ✅)
+Home/UI:    https://web-production-31e99.up.railway.app/
+Dashboard:  https://web-production-31e99.up.railway.app/dashboard
+Login:      https://web-production-31e99.up.railway.app/login
+Health:     https://web-production-31e99.up.railway.app/health
 
 ## NEW - Phase 2 Endpoints (Account Management)
 All Accounts:       /accounts
@@ -23,8 +23,8 @@ WebSocket URL:      /websocket/url (requires auth + account selection)
 Market Data WS:     /market-data/url
 
 ## NEW - Frontend UI
-Onboarding Screen:  https://web-production-d675d.up.railway.app/
-Login Screen:       https://web-production-d675d.up.railway.app/login
+Onboarding Screen:  https://web-production-31e99.up.railway.app/
+Login Screen:       https://web-production-31e99.up.railway.app/login
 - Apple-style login design with dark theme
 - OAuth integration with "Continue with Deriv OAuth" button
 - Email/password fields with visibility toggle
@@ -40,7 +40,7 @@ Onboarding Features:
 - Mobile-responsive design
 
 ## Registered Redirect URIs in Deriv Dashboard
-- https://web-production-d675d.up.railway.app/callback
+- https://web-production-31e99.up.railway.app/callback
 - https://deriv-oauth-app.onrender.com/callback
 
 ## UptimeRobot Monitoring
