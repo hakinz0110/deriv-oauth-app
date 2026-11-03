@@ -95,4 +95,10 @@ def create_app():
     from app.routes import auth_bp
     app.register_blueprint(auth_bp)
     
+    # Log registered routes for debugging
+    app.logger.info('=== Registered Routes ===')
+    for rule in app.url_map.iter_rules():
+        app.logger.info(f'{rule.endpoint}: {rule.rule}')
+    app.logger.info('=== End Routes ===')
+    
     return app
