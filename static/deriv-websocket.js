@@ -398,7 +398,6 @@ class DerivWebSocketClient {
         // Reconnect
         await this.connect();
     }
-    }
 }
 
 // Global instance
