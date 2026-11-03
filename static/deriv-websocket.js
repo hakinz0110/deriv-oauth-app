@@ -404,8 +404,21 @@ class DerivWebSocketClient {
 let derivClient;
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('=== HTS Trade WebSocket Client Starting ===');
+    
+    // Only initialize if user is authenticated
+    try {
+        const authCheck = await fetch('/accounts/selected');
+        if (authCheck.status === 401) {
+            console.debug('User not authenticated - WebSocket will not initialize');
+            return;
+        }
+    } catch (error) {
+        console.debug('Auth check failed - WebSocket will not initialize');
+        return;
+    }
+    
     derivClient = new DerivWebSocketClient();
     derivClient.initialize(); // Load cache first, then connect
 });

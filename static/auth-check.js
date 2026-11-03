@@ -7,7 +7,7 @@ async function checkAuthentication() {
         
         if (response.status === 401 || response.status === 403) {
             // Not authenticated - redirect to login
-            console.log('Not authenticated, redirecting to login...');
+            console.debug('Not authenticated, redirecting to login...');
             window.location.href = '/login';
             return false;
         }
@@ -23,7 +23,7 @@ async function checkAuthentication() {
         
         return false;
     } catch (error) {
-        console.error('Auth check failed:', error);
+        console.debug('Auth check network error (expected before login)');
         return false;
     }
 }
