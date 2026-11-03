@@ -328,6 +328,45 @@
             </div>
         </div>
     </div>
+    
+    <!-- Mobile Bottom Navigation (Hidden on Desktop) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+        <div class="grid grid-cols-4 h-16">
+            <!-- Dashboard -->
+            <a href="/dashboard" class="flex flex-col items-center justify-center gap-1 bg-yellow-400 text-gray-900">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                </svg>
+                <span class="text-xs font-semibold">Dashboard</span>
+            </a>
+            
+            <!-- Bot Activity -->
+            <a href="/chart" class="flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                <span class="text-xs font-medium">Activity</span>
+            </a>
+            
+            <!-- History -->
+            <a href="/history" class="flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span class="text-xs font-medium">History</span>
+            </a>
+            
+            <!-- Settings -->
+            <a href="/settings" class="flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6"></path>
+                </svg>
+                <span class="text-xs font-medium">Settings</span>
+            </a>
+        </div>
+    </nav>
 </div>
 {% endblock %}
 
