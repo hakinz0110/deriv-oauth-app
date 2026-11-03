@@ -243,6 +243,13 @@ class AnalyticsWidget {
                 credentials: 'same-origin'
             });
             
+            // If analytics service not available (500), silently skip
+            if (response.status === 500) {
+                console.debug('Analytics service not available');
+                this.lastPollTime = new Date().toISOString();
+                return;
+            }
+            
             if (response.ok) {
                 const data = await response.json();
                 
@@ -260,7 +267,7 @@ class AnalyticsWidget {
             
             this.lastPollTime = new Date().toISOString();
         } catch (error) {
-            console.error('Failed to check for trade closures:', error);
+            console.debug('Trade closure check skipped:', error.message);
         }
     }
 
