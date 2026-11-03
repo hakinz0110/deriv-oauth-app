@@ -173,7 +173,11 @@ def register_error_handlers(app):
     @app.errorhandler(AppError)
     def handle_app_error(error):
         """Handle all custom application errors."""
-        current_app.logger.error(f'{error.error_code}: {error.message}')
+        # Log authentication errors as debug (they're expected for unauthenticated requests)
+        if isinstance(error, AuthenticationError):
+            current_app.logger.debug(f'{error.error_code}: {error.message}')
+        else:
+            current_app.logger.error(f'{error.error_code}: {error.message}')
         return error.to_response()
     
     @app.errorhandler(404)
