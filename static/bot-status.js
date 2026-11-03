@@ -45,10 +45,10 @@ class BotStatusManager {
             const response = await fetch('/api/bot/status');
             
             if (!response.ok) {
-                // If bot service returns 500, it's not implemented yet
+                // If bot service returns 500, it's not running - this is normal
                 if (response.status === 500) {
-                    console.debug('Bot service not available - stopping status polling');
-                    this.stop(); // Stop polling to prevent error spam
+                    // Silently stop polling (bot not running is expected state)
+                    this.stop();
                     return;
                 }
                 throw new Error(`HTTP ${response.status}`);

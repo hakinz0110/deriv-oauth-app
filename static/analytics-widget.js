@@ -239,36 +239,38 @@ class AnalyticsWidget {
         try {
             const since = this.lastPollTime || new Date(Date.now() - 60000).toISOString();
             
-            const response = await fetch(`/api/bot/recent-closures?since=${since}&limit=5`, {
-                credentials: 'same-origin'
-            });
-            
-            // If analytics service not available (500), silently skip
-            if (response.status === 500) {
-                console.debug('Analytics service not available');
-                this.lastPollTime = new Date().toISOString();
-                return;
-            }
-            
-            if (response.ok) {
-                const data = await response.json();
+            try {
+                const response = await fetch(`/api/bot/recent-closures?since=${since}&limit=5`, {
+                    credentials: 'same-origin'
+                });
                 
-                if (data.status === 'success' && data.count > 0) {
-                    console.log(`Analytics Widget: Detected ${data.count} trade closure(s), refreshing...`);
+                // If analytics service not available (500), silently skip
+                if (response.status === 500) {
+                    // Bot not running - expected, don't log
+                    this.lastPollTime = new Date().toISOString();
+                    return;
+                }
+                
+                if (response.ok) {
+                    const data = await response.json();
                     
-                    // Throttle refresh
-                    const now = Date.now();
+                    if (data.status === 'success' && data.count > 0) {
+                        console.log(`Analytics Widget: Detected ${data.count} trade closure(s), refreshing...`);
+                        
+                        // Throttle refresh
+                        const now = Date.now();
                     if (now - this.lastRefreshTime >= this.refreshThrottle) {
                         await this.loadAnalytics();
                         this.lastRefreshTime = now;
                     }
                 }
+                }
+                
+                this.lastPollTime = new Date().toISOString();
+            } catch (error) {
+                // Bot not running - silently skip (expected state)
+                this.lastPollTime = new Date().toISOString();
             }
-            
-            this.lastPollTime = new Date().toISOString();
-        } catch (error) {
-            console.debug('Trade closure check skipped:', error.message);
-        }
     }
 
     /**
