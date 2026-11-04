@@ -14,6 +14,18 @@ def create_app():
     app = Flask(__name__, template_folder=template_dir, static_folder=static_dir, static_url_path='/static')
     app.config.from_object(Config)
     
+    # ==================== CACHE CONTROL ====================
+    # Prevent browser caching of HTML templates
+    @app.after_request
+    def add_header(response):
+        # Don't cache HTML pages (templates)
+        if response.content_type and 'text/html' in response.content_type:
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+        return response
+    # ==================== END CACHE CONTROL ====================
+    
     # ==================== PRODUCTION LOGGING ====================
     # Configure logging for production monitoring
     if not app.debug:
